@@ -6,4 +6,8 @@ abstract class Card {
   String spritePath;
 
   Card(this.name, this.color, this.spritePath);
+
+  void toPrint(){
+    print("$name\n");
+  }
 }
