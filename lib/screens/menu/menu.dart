@@ -1,3 +1,4 @@
+import 'package:balawish/screens/board/board.dart';
 import 'package:balawish/screens/settings/settings.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:balawish/widgets/menu/card_fan.dart';
@@ -40,7 +41,9 @@ class Menu extends StatelessWidget {
                       ),
                       const Spacer(),
                       FloatingButton(
-                        onPressed: () => {print("play")},
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const Board()),
+                        ),
                         label: Text(
                           'JOUER',
                           style: context.text.headlineMedium?.copyWith(

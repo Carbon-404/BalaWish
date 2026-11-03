@@ -50,7 +50,7 @@ class Settings extends StatelessWidget {
   }
 }
 
-/// Une option de thème : son nom et un aperçu de ses couleurs.
+// Option de thème son nom et un aperçu de ses couleurs
 class _ThemeTile extends StatelessWidget {
   const _ThemeTile({
     required this.id,

@@ -2,7 +2,13 @@ import 'package:balawish/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 class FloatingButton extends StatelessWidget {
-  const FloatingButton({super.key, this.icon, required this.onPressed, this.label, this.tooltip});
+  const FloatingButton({
+    super.key,
+    this.icon,
+    required this.onPressed,
+    this.label,
+    this.tooltip,
+  });
 
   final Icon? icon;
   final VoidCallback? onPressed;
@@ -17,14 +23,17 @@ class FloatingButton extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
           if (game.glow > 0)
-            BoxShadow(color: game.chips.withValues(alpha: 0.55), blurRadius: game.glow),
+            BoxShadow(
+              color: game.chips.withValues(alpha: 0.55),
+              blurRadius: game.glow,
+            ),
         ],
       ),
       child: FloatingActionButton.extended(
         onPressed: onPressed,
         heroTag: null,
         tooltip: tooltip,
-        label: label?? const Text(""),
+        label: label ?? const Text(""),
         icon: icon,
       ),
     );

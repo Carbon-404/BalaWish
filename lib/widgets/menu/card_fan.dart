@@ -57,7 +57,10 @@ class _CardFanState extends State<CardFan> with SingleTickerProviderStateMixin {
     vsync: this,
     duration: const Duration(seconds: 4),
   );
-  late final Animation<double> _wave = CurvedAnimation(parent: _controller, curve: Curves.easeInOut);
+  late final Animation<double> _wave = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeInOut,
+  );
 
   @override
   void initState() {
@@ -87,7 +90,8 @@ class _CardFanState extends State<CardFan> with SingleTickerProviderStateMixin {
     final cardHeight = widget.cardWidth * 1.45;
     final step = widget.cardWidth * (1 - widget.overlap); // décalage horizontal
     final middle = (count - 1) / 2;
-    final dropPerCard = widget.cardWidth * 0.15; // les cartes des bords descendent
+    final dropPerCard =
+        widget.cardWidth * 0.15; // les cartes des bords descendent
     final maxDrop = middle * dropPerCard;
 
     return SizedBox(
@@ -146,7 +150,11 @@ class _CardFanState extends State<CardFan> with SingleTickerProviderStateMixin {
         angle: angle,
         // Pivot sous la carte : donne l'effet « tenu en main ».
         alignment: const Alignment(0, 1.4),
-        child: _BigCardFace(card: card, width: widget.cardWidth, height: cardHeight),
+        child: _BigCardFace(
+          card: card,
+          width: widget.cardWidth,
+          height: cardHeight,
+        ),
       ),
     );
   }
@@ -155,7 +163,11 @@ class _CardFanState extends State<CardFan> with SingleTickerProviderStateMixin {
 /// Face d'une grande carte : rang et enseigne en haut à gauche, enseigne au
 /// centre, et le coin opposé retourné. Les couleurs viennent du thème.
 class _BigCardFace extends StatelessWidget {
-  const _BigCardFace({required this.card, required this.width, required this.height});
+  const _BigCardFace({
+    required this.card,
+    required this.width,
+    required this.height,
+  });
 
   final FanCard card;
   final double width;
@@ -170,9 +182,19 @@ class _BigCardFace extends StatelessWidget {
     final corner = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Text(card.rank,
-            style: TextStyle(color: ink, fontSize: width * 0.2, fontWeight: FontWeight.w700, height: 1)),
-        Text(card.suit, style: TextStyle(color: ink, fontSize: width * 0.16, height: 1.1)),
+        Text(
+          card.rank,
+          style: TextStyle(
+            color: ink,
+            fontSize: width * 0.2,
+            fontWeight: FontWeight.w700,
+            height: 1,
+          ),
+        ),
+        Text(
+          card.suit,
+          style: TextStyle(color: ink, fontSize: width * 0.16, height: 1.1),
+        ),
       ],
     );
 
@@ -186,7 +208,9 @@ class _BigCardFace extends StatelessWidget {
         border: isNeon ? Border.all(color: ink, width: 1.5) : null,
         boxShadow: [
           BoxShadow(
-            color: isNeon ? ink.withValues(alpha: 0.6) : Colors.black.withValues(alpha: 0.4),
+            color: isNeon
+                ? ink.withValues(alpha: 0.6)
+                : Colors.black.withValues(alpha: 0.4),
             blurRadius: isNeon ? game.glow : 18,
             offset: isNeon ? Offset.zero : const Offset(0, 8),
           ),
@@ -195,8 +219,16 @@ class _BigCardFace extends StatelessWidget {
       child: Stack(
         children: [
           Align(alignment: Alignment.topLeft, child: corner),
-          Center(child: Text(card.suit, style: TextStyle(color: ink, fontSize: width * 0.46))),
-          Align(alignment: Alignment.bottomRight, child: RotatedBox(quarterTurns: 2, child: corner)),
+          Center(
+            child: Text(
+              card.suit,
+              style: TextStyle(color: ink, fontSize: width * 0.46),
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomRight,
+            child: RotatedBox(quarterTurns: 2, child: corner),
+          ),
         ],
       ),
     );
