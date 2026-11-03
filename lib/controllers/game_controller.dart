@@ -33,6 +33,27 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void openShop() {
+    run.openShop();
+    notifyListeners();
+  }
+
+  void buyJoker(int offerIndex) {
+    if (!run.canBuy(offerIndex)) return;
+    run.buyJoker(offerIndex);
+    notifyListeners();
+  }
+
+  void sellJoker(int index) {
+    run.sellJoker(index);
+    notifyListeners();
+  }
+
+  void moveJoker(int from, int to) {
+    run.moveJoker(from, to);
+    notifyListeners();
+  }
+
   void nextRound() {
     run.nextRound();
     notifyListeners();

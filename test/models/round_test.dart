@@ -118,6 +118,7 @@ void main() {
       // Manches 1 et 2 gagnées : la manche 3 (blinde 450) a 5 mains.
       for (var i = 0; i < 2; i++) {
         run.currentRound.status = RoundStatus.won;
+        run.openShop();
         run.nextRound();
       }
       expect(run.currentRound.blind, 450);
@@ -131,21 +132,23 @@ void main() {
       expect(GameRun.blindFor(4), 675);
     });
 
-    test('la manche suivante rapporte 3 pièces + 1 par main non jouée', () {
+    test('gagner une manche rapporte 3 pièces + 1 par main non jouée', () {
       final run = GameRun();
       run.currentRound
         ..score = run.currentRound.blind
         ..status = RoundStatus.won
         ..handsLeft = 2;
 
-      run.nextRound();
-
+      run.openShop();
       expect(run.coins, 5);
+
+      run.nextRound();
       expect(run.roundNumber, 2);
       expect(run.currentRound.blind, 300);
     });
 
-    test("on ne passe pas à la manche suivante sans l'avoir gagnée", () {
+    test('pas de boutique sans victoire, pas de manche suivante sans boutique', () {
+      expect(() => GameRun().openShop(), throwsStateError);
       expect(() => GameRun().nextRound(), throwsStateError);
     });
   });

@@ -2,8 +2,12 @@ import 'dart:math';
 
 import 'package:balawish/controllers/game_controller.dart';
 import 'package:balawish/models/cards/playing_card.dart';
+import 'package:balawish/models/game/game_run.dart';
 import 'package:balawish/models/game/round.dart';
+import 'package:balawish/models/jokers/joker.dart';
+import 'package:balawish/screens/shop/shop.dart';
 import 'package:balawish/theme/theme.dart';
+import 'package:balawish/widgets/jokers/joker_view.dart';
 import 'package:balawish/widgets/game/hand_score_panel.dart';
 import 'package:balawish/widgets/game/playing_card_view.dart';
 import 'package:balawish/widgets/game/round_end_panel.dart';
@@ -37,6 +41,16 @@ class _BoardState extends State<Board> {
           final run = _controller.run;
           final round = run.currentRound;
 
+          if (run.isInShop) {
+            return ShopScreen(
+              run: run,
+              onBuy: _controller.buyJoker,
+              onSell: _controller.sellJoker,
+              onMove: _controller.moveJoker,
+              onContinue: _controller.nextRound,
+            );
+          }
+
           return Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.transparent,
@@ -52,6 +66,8 @@ class _BoardState extends State<Board> {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
+                        _JokerStrip(jokers: run.jokers),
+                        const SizedBox(height: 12),
                         RoundStats(run: run),
                         const SizedBox(height: 16),
                         HandScorePanel(round: round),
@@ -80,7 +96,7 @@ class _BoardState extends State<Board> {
                     Positioned.fill(
                       child: RoundEndPanel(
                         run: run,
-                        onNextRound: _controller.nextRound,
+                        onOpenShop: _controller.openShop,
                         onRestart: _controller.restart,
                         onQuit: () => Navigator.of(context).pop(),
                       ),
@@ -91,6 +107,34 @@ class _BoardState extends State<Board> {
           );
         },
       ),
+    );
+  }
+}
+
+// Jokers du joueur dans l'ordre d'application
+class _JokerStrip extends StatelessWidget {
+  const _JokerStrip({required this.jokers});
+
+  final List<Joker> jokers;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        for (var i = 0; i < GameRun.maxJokers; i++)
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2),
+              child: i < jokers.length
+                  ? JokerView(
+                      joker: jokers[i],
+                      width: double.infinity,
+                      compact: true,
+                    )
+                  : const SizedBox(height: 40),
+            ),
+          ),
+      ],
     );
   }
 }

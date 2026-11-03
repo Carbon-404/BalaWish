@@ -8,13 +8,13 @@ class RoundEndPanel extends StatelessWidget {
   const RoundEndPanel({
     super.key,
     required this.run,
-    required this.onNextRound,
+    required this.onOpenShop,
     required this.onRestart,
     required this.onQuit,
   });
 
   final GameRun run;
-  final VoidCallback onNextRound;
+  final VoidCallback onOpenShop;
   final VoidCallback onRestart;
   final VoidCallback onQuit;
 
@@ -54,7 +54,8 @@ class RoundEndPanel extends StatelessWidget {
                 Text(
                 '+${run.roundReward} pièces\n'
                 '${GameRun.baseReward} de base + ${round.handsLeft} '
-                  'pour les mains non jouées',
+                  'pour les mains non jouées'
+                  '${run.jokerCoins > 0 ? ' + ${run.jokerCoins} des jokers' : ''}',
                   textAlign: TextAlign.center,
                   style: context.text.bodyMedium?.copyWith(color: game.coins),
                 ),
@@ -71,8 +72,8 @@ class RoundEndPanel extends StatelessWidget {
               const SizedBox(height: 24),
               if (won)
                 FilledButton(
-                  onPressed: onNextRound,
-                  child: const Text('Manche suivante'),
+                  onPressed: onOpenShop,
+                  child: const Text('Boutique'),
                 )
               else
                 Row(

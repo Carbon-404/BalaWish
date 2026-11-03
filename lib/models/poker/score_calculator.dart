@@ -1,5 +1,8 @@
+import 'package:balawish/models/jokers/joker.dart';
+
 import 'hand_evaluator.dart';
 import 'poker_hand.dart';
+import 'score_context.dart';
 
 // Détail du score d'une main jouée
 class ScoreBreakdown {
@@ -18,19 +21,26 @@ class ScoreBreakdown {
 class ScoreCalculator {
   ScoreCalculator._();
 
-  static ScoreBreakdown score(HandResult result) {
-    // d'abord les jetons et multi de base du type de main
-    var chips = result.hand.baseChips;
-    final mult = result.hand.baseMult;
+  static ScoreBreakdown score(
+    HandResult result, [
+    List<Joker> jokers = const [],
+  ]) {
+    // jetons et multi de base du type de main
+    final context = ScoreContext(result);
 
-    // ensuite les cartes qui forment la main de gauche à droite
+    // les cartes qui forment la main de gauche à droite avec les effets de joker liés à chaque carte
     for (final card in result.scoringCards) {
-      chips += card.chips;
+      context.chips += card.chips;
+      for (final joker in jokers) {
+        joker.onCardScored(context, card);
+      }
     }
 
-    // TODO
-    // enfin les effets des jokers de gauche à droite
+    // les effets des jokers dans l'ordre
+    for (final joker in jokers) {
+      joker.onHandScored(context);
+    }
 
-    return ScoreBreakdown(result, chips, mult);
+    return ScoreBreakdown(result, context.chips, context.mult);
   }
 }

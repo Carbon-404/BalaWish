@@ -1,5 +1,6 @@
 import 'package:balawish/models/cards/deck.dart';
 import 'package:balawish/models/cards/playing_card.dart';
+import 'package:balawish/models/jokers/joker.dart';
 import 'package:balawish/models/poker/hand_evaluator.dart';
 import 'package:balawish/models/poker/score_calculator.dart';
 
@@ -15,6 +16,7 @@ class Round {
     required Deck deck,
     this.handsLeft = defaultHands,
     this.discardsLeft = defaultDiscards,
+    this.jokers = const [],
   }) : _deck = deck {
     _refillHand();
   }
@@ -24,6 +26,10 @@ class Round {
   static const defaultDiscards = 3;
 
   final int blind;
+
+  // Jokers actifs pendant la manche
+  final List<Joker> jokers;
+
   final Deck _deck;
   final List<PlayingCard> _hand = [];
   final List<PlayingCard> _selected = [];
@@ -67,7 +73,10 @@ class Round {
     if (!canPlay) throw StateError('Aucune carte jouable.');
 
     final played = selected;
-    final breakdown = ScoreCalculator.score(HandEvaluator.evaluate(played));
+    final breakdown = ScoreCalculator.score(
+      HandEvaluator.evaluate(played),
+      jokers,
+    );
     score += breakdown.total;
     handsLeft--;
     lastScore = breakdown;
