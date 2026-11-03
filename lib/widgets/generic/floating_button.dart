@@ -22,6 +22,7 @@ class FloatingButton extends StatelessWidget {
       ),
       child: FloatingActionButton.extended(
         onPressed: onPressed,
+        heroTag: null,
         tooltip: tooltip,
         label: label?? const Text(""),
         icon: icon,
