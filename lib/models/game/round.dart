@@ -3,6 +3,7 @@ import 'package:balawish/models/cards/playing_card.dart';
 import 'package:balawish/models/jokers/joker.dart';
 import 'package:balawish/models/poker/hand_evaluator.dart';
 import 'package:balawish/models/poker/score_calculator.dart';
+import 'package:balawish/models/enemy/enemy.dart';
 
 enum RoundStatus { playing, won, lost }
 
@@ -14,6 +15,7 @@ class Round {
   Round({
     required this.blind,
     required Deck deck,
+    required this.enemy,
     this.handsLeft = defaultHands,
     this.discardsLeft = defaultDiscards,
     this.jokers = const [],
@@ -31,6 +33,7 @@ class Round {
   final List<Joker> jokers;
 
   final Deck _deck;
+  final Enemy enemy;
   final List<PlayingCard> _hand = [];
   final List<PlayingCard> _selected = [];
 

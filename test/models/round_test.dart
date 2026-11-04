@@ -103,12 +103,13 @@ void main() {
   group('GameRun', () {
     test('+1 main chaque fois que la blinde double, plafonné à 8', () {
       expect(GameRun.handsFor(200), 4);
-      expect(GameRun.handsFor(399), 4);
-      expect(GameRun.handsFor(400), 5);
-      expect(GameRun.handsFor(800), 6);
-      expect(GameRun.handsFor(1600), 7);
-      expect(GameRun.handsFor(3200), 8);
-      expect(GameRun.handsFor(1000000), GameRun.maxHands);
+      expect(GameRun.handsFor(799), 4);
+      expect(GameRun.handsFor(1200), 6);
+      expect(GameRun.handsFor(1600), 6);
+      expect(GameRun.handsFor(1601), 7);
+      expect(GameRun.handsFor(4999), 7);
+      expect(GameRun.handsFor(5000), 8);
+      expect(GameRun.handsFor(1000000), 8);
     });
 
     test('chaque manche reçoit le nombre de mains de sa blinde', () {
@@ -121,15 +122,15 @@ void main() {
         run.openShop();
         run.nextRound();
       }
-      expect(run.currentRound.blind, 450);
-      expect(run.currentRound.handsLeft, 5);
+      expect(run.currentRound.blind, 800);
+      expect(run.currentRound.handsLeft, 6);
     });
 
     test('les blindes augmentent de 50 % à chaque manche', () {
-      expect(GameRun.blindFor(1), 200);
-      expect(GameRun.blindFor(2), 300);
-      expect(GameRun.blindFor(3), 450);
-      expect(GameRun.blindFor(4), 675);
+      expect(GameRun.blindFor(1), 300);
+      expect(GameRun.blindFor(2), 450);
+      expect(GameRun.blindFor(3), 800);
+      expect(GameRun.blindFor(4), 1200);
     });
 
     test('gagner une manche rapporte 3 pièces + 1 par main non jouée', () {
@@ -144,7 +145,7 @@ void main() {
 
       run.nextRound();
       expect(run.roundNumber, 2);
-      expect(run.currentRound.blind, 300);
+      expect(run.currentRound.blind, 450);
     });
 
     test('pas de boutique sans victoire, pas de manche suivante sans boutique', () {

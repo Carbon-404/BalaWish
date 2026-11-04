@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:balawish/models/cards/deck.dart';
 import 'package:balawish/models/jokers/joker.dart';
+import 'package:balawish/models/enemy/enemy.dart';
 import 'package:balawish/models/shop/shop.dart';
 
 import 'round.dart';
@@ -11,15 +12,6 @@ class GameRun {
   GameRun({Random? random}) : _random = random {
     currentRound = _createRound();
   }
-
-  static const startingBlind = 200;
-  static const blindGrowth = 1.5;
-
-  // Mains de la première manche
-  static const baseHands = 4;
-
-  // Mains max par manche
-  static const maxHands = 8;
 
   // Pièces gagnées par manche (augmente avec les main non utilisées)
   static const baseReward = 3;
@@ -46,18 +38,20 @@ class GameRun {
 
   /// Blinde de la manche [number] : 200, 300, 450, 675…
   static int blindFor(int number) {
-    return (startingBlind * pow(blindGrowth, number - 1)).round();
+    return Enemy.values.where((r) => r.order == number).first.score;
   }
 
-  /// Nombre de mains accordées pour battre [blind] : 4, puis +1 qand la blinde double (plafonné à [maxHands])
+  /// Image de l'ennemi en fonction du round
+  static Enemy enemyFor(int number) {
+    return Enemy.values.where((r) => r.order == number).first;
+  }
+
+  /// Nombre de mains accordées pour battre [blind]
   static int handsFor(int blind) {
-    var hands = baseHands;
-    for (var threshold = startingBlind * 2;
-    threshold <= blind && hands < maxHands;
-    threshold *= 2) {
-      hands++;
-    }
-    return hands;
+    if(blind < 800) return 4;
+    if(blind <= 1600) return 6;
+    if(blind < 5000) return 7;
+    return 8;
   }
 
   // Pièces bonus des jokers
@@ -113,6 +107,7 @@ class GameRun {
     return Round(
       blind: blind,
       deck: Deck.standard(_random),
+      enemy: enemyFor(roundNumber),
       handsLeft: handsFor(blind),
       jokers: List.unmodifiable(_jokers),
     );

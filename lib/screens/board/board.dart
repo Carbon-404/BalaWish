@@ -72,6 +72,8 @@ class _BoardState extends State<Board> {
                         const SizedBox(height: 16),
                         HandScorePanel(round: round),
                         const Spacer(),
+                        Image.asset('assets/enemies/${themeNotifier.value.name}/${round.enemy.picName}.png', height: 180),
+                        const Spacer(),
                         _HandView(
                           round: round,
                           onCardTap: _controller.toggleSelection,
