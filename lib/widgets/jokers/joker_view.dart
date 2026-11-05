@@ -11,12 +11,16 @@ class JokerView extends StatelessWidget {
     this.width = 110,
     this.compact = false,
     this.footer,
+    this.disabled = false,
   });
 
   final Joker joker;
   final double width;
   final bool compact;
   final Widget? footer;
+
+  // Joker neutralisé par un boss : grisé et sans effet pendant la manche
+  final bool disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +55,9 @@ class JokerView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 style:
-                    (compact ? context.text.labelSmall : context.text.labelLarge)
+                    (compact
+                            ? context.text.labelSmall
+                            : context.text.labelLarge)
                         ?.copyWith(color: color, fontWeight: FontWeight.w700),
               ),
               if (!compact) ...[
@@ -70,6 +76,12 @@ class JokerView extends StatelessWidget {
       ),
     );
 
+    if (disabled) {
+      return Tooltip(
+        message: 'Désactivé pour cette manche',
+        child: Opacity(opacity: 0.35, child: card),
+      );
+    }
     return compact ? Tooltip(message: joker.description, child: card) : card;
   }
 }

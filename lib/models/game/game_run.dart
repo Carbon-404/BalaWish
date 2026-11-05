@@ -34,46 +34,80 @@ class GameRun {
 
   bool get isInShop => shop != null;
 
-  bool get isOver => currentRound.status == RoundStatus.lost;
+  // Nombre de manches d'une partie : une par ennemi, La Maison en dernier
+  static int get roundCount => Enemy.values.length;
 
-  /// Blinde de la manche [number] : 200, 300, 450, 675…
-  static int blindFor(int number) {
-    return Enemy.values.where((r) => r.order == number).first.score;
-  }
+  Enemy get enemy => currentRound.enemy;
 
-  /// Image de l'ennemi en fonction du round
+  // Dernière manche de la partie (le boss final)
+  bool get isFinalRound => roundNumber >= roundCount;
+
+  // Partie gagnée : le boss final est battu
+  bool get isVictory => isFinalRound && currentRound.status == RoundStatus.won;
+
+  // Partie terminée, gagnée ou perdue
+  bool get isOver => currentRound.status == RoundStatus.lost || isVictory;
+
+  /// Blinde de la manche [number] : le score de son ennemi
+  static int blindFor(int number) => enemyFor(number).score;
+
+  /// Ennemi affronté à la manche [number]
   static Enemy enemyFor(int number) {
-    return Enemy.values.where((r) => r.order == number).first;
+    final enemy = Enemy.forRound(number);
+    if (enemy == null) {
+      throw RangeError.range(
+        number,
+        1,
+        roundCount,
+        'number',
+        'Manche inexistante',
+      );
+    }
+    return enemy;
   }
 
   /// Nombre de mains accordées pour battre [blind]
   static int handsFor(int blind) {
-    if(blind < 800) return 4;
-    if(blind <= 1600) return 6;
-    if(blind < 5000) return 7;
+    if (blind < 800) return 4;
+    if (blind <= 1600) return 6;
+    if (blind < 5000) return 7;
     return 8;
   }
 
   // Pièces bonus des jokers
   int get jokerCoins => _jokers.fold(0, (sum, j) => sum + j.roundEndCoins);
 
+  // Multiplicateur de récompense du boss (Le Banquier double les pièces)
+  int get rewardMultiplier =>
+      enemy.effect == BossEffect.singleDiscardDoubleReward ? 2 : 1;
+
   // Pièces que rapporte la manche
-  int get roundReward => baseReward + currentRound.handsLeft + jokerCoins;
+  int get roundReward =>
+      (baseReward + currentRound.handsLeft + jokerCoins) * rewardMultiplier;
+
+  // Pièces prises par le boss à chaque défausse (Valet Tricheur)
+  int get discardCost => enemy.effect == BossEffect.discardCostsCoin ? 1 : 0;
+
+  // Défausse la sélection en appliquant le coût éventuel du boss
+  // Le boss ne prend que les pièces disponibles : le solde ne devient jamais négatif
+  void discard() {
+    currentRound.discard();
+    coins = max(0, coins - discardCost);
+  }
 
   // Enregistre la récompense de la manche gagnée et ouvre la boutique
   void openShop() {
     if (currentRound.status != RoundStatus.won || isInShop) {
       throw StateError("La manche en cours n'est pas gagnée.");
     }
+    if (isFinalRound) throw StateError('La partie est terminée.');
     coins += roundReward;
     shop = Shop(owned: _jokers, random: _random);
   }
 
   bool canBuy(int offerIndex) {
     final offer = shop?.offers[offerIndex];
-    return offer != null &&
-        coins >= offer.price &&
-        _jokers.length < maxJokers;
+    return offer != null && coins >= offer.price && _jokers.length < maxJokers;
   }
 
   void buyJoker(int offerIndex) {
@@ -101,15 +135,16 @@ class GameRun {
     currentRound = _createRound();
   }
 
-  // Reset la piche pour chaque début de manche
+  // Reset la pioche pour chaque début de manche
   Round _createRound() {
-    final blind = blindFor(roundNumber);
+    final enemy = enemyFor(roundNumber);
     return Round(
-      blind: blind,
+      blind: enemy.score,
       deck: Deck.standard(_random),
-      enemy: enemyFor(roundNumber),
-      handsLeft: handsFor(blind),
-      jokers: List.unmodifiable(_jokers),
+      enemy: enemy,
+      handsLeft: handsFor(enemy.score),
+      jokers: _jokers,
+      random: _random,
     );
   }
 }

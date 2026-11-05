@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:balawish/models/cards/deck.dart';
 import 'package:balawish/models/cards/playing_card.dart';
+import 'package:balawish/models/cards/suit.dart';
 import 'package:balawish/models/jokers/joker.dart';
 import 'package:balawish/models/poker/hand_evaluator.dart';
 import 'package:balawish/models/poker/score_calculator.dart';
@@ -11,15 +14,27 @@ enum RoundStatus { playing, won, lost }
 ///
 /// La manche est gagnée dès que le score atteint la blinde,
 /// et perdue si les mains (ou les cartes) tombe à 0 avant d'avoir battu la blinde
+///
+/// L'effet de l'[enemy] (s'il s'agit d'un boss) s'applique pendant toute la manche
 class Round {
   Round({
     required this.blind,
     required Deck deck,
     required this.enemy,
     this.handsLeft = defaultHands,
-    this.discardsLeft = defaultDiscards,
-    this.jokers = const [],
-  }) : _deck = deck {
+    int? discardsLeft,
+    List<Joker> jokers = const [],
+    Random? random,
+  }) : _deck = deck,
+       _random = random ?? Random(),
+       discardsLeft = discardsLeft ?? discardsFor(enemy),
+       disabledJoker = enemy.effect == BossEffect.disableFirstJoker
+           ? jokers.firstOrNull
+           : null,
+       jokers = enemy.effect == BossEffect.disableFirstJoker
+           ? List.unmodifiable(jokers.skip(1))
+           : List.unmodifiable(jokers) {
+    _rollForbiddenSuit();
     _refillHand();
   }
 
@@ -27,12 +42,22 @@ class Round {
   static const defaultHands = 4;
   static const defaultDiscards = 3;
 
+  /// Nombre de défausses accordées face à [enemy]
+  static int discardsFor(Enemy enemy) =>
+      enemy.effect == BossEffect.singleDiscardDoubleReward
+      ? 1
+      : defaultDiscards;
+
   final int blind;
 
-  // Jokers actifs pendant la manche
+  // Jokers actifs pendant la manche (sans celui désactivé par le boss)
   final List<Joker> jokers;
 
+  // Joker désactivé par le boss pour cette manche
+  final Joker? disabledJoker;
+
   final Deck _deck;
+  final Random _random;
   final Enemy enemy;
   final List<PlayingCard> _hand = [];
   final List<PlayingCard> _selected = [];
@@ -41,6 +66,9 @@ class Round {
   int discardsLeft;
   int score = 0;
   RoundStatus status = RoundStatus.playing;
+
+  // Enseigne interdite pour la main en cours (Baron Roulette)
+  Suit? forbiddenSuit;
 
   // Score de la dernière main jouée, pour l'affichage
   ScoreBreakdown? lastScore;
@@ -61,6 +89,16 @@ class Round {
 
   bool isSelected(PlayingCard card) => _selected.contains(card);
 
+  /// true si [card] est neutralisée par le boss : elle peut être jouée et
+  /// compte pour former la main, mais ne marque pas
+  bool isDebuffed(PlayingCard card) {
+    return switch (enemy.effect) {
+      BossEffect.spadesDebuffed => card.suit == Suit.spades,
+      BossEffect.randomSuitDebuffed => card.suit == forbiddenSuit,
+      _ => false,
+    };
+  }
+
   /// Sélectionne ou désélectionne [card]
   /// Retourne false si rien n'a changé (manche terminée, carte absente de la main, ou déjà 5 cartes choisies)
   bool toggleSelection(PlayingCard card) {
@@ -71,15 +109,19 @@ class Round {
     return true;
   }
 
+  ScoreBreakdown _scoreOf(List<PlayingCard> cards) {
+    return ScoreCalculator.score(
+      HandEvaluator.evaluate(cards),
+      jokers,
+      isDebuffed,
+    );
+  }
+
   // Joue les cartes sélectionnées et ajoute les points au score
   ScoreBreakdown play() {
     if (!canPlay) throw StateError('Aucune carte jouable.');
 
-    final played = selected;
-    final breakdown = ScoreCalculator.score(
-      HandEvaluator.evaluate(played),
-      jokers,
-    );
+    final breakdown = _scoreOf(selected);
     score += breakdown.total;
     handsLeft--;
     lastScore = breakdown;
@@ -90,6 +132,7 @@ class Round {
     } else if (handsLeft == 0) {
       status = RoundStatus.lost;
     } else {
+      _rollForbiddenSuit();
       _refillHand();
       // Plus de carte en main ni dans la pioche -> impossible de continuer
       if (_hand.isEmpty) status = RoundStatus.lost;
@@ -109,6 +152,12 @@ class Round {
   void _removeSelectedFromHand() {
     _hand.removeWhere(_selected.contains);
     _selected.clear();
+  }
+
+  // Tire une nouvelle enseigne interdite au début de chaque main
+  void _rollForbiddenSuit() {
+    if (enemy.effect != BossEffect.randomSuitDebuffed) return;
+    forbiddenSuit = Suit.values[_random.nextInt(Suit.values.length)];
   }
 
   /// Complète la main jusqu'à [handSize] cartes (s'il en reste assez dans la pioche)

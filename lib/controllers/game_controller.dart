@@ -29,7 +29,7 @@ class GameController extends ChangeNotifier {
 
   void discard() {
     if (!round.canDiscard) return;
-    round.discard();
+    run.discard();
     notifyListeners();
   }
 

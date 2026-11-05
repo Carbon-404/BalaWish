@@ -7,6 +7,7 @@ import 'package:balawish/models/game/round.dart';
 import 'package:balawish/models/jokers/joker.dart';
 import 'package:balawish/screens/shop/shop.dart';
 import 'package:balawish/theme/theme.dart';
+import 'package:balawish/widgets/enemy/enemy_view.dart';
 import 'package:balawish/widgets/jokers/joker_view.dart';
 import 'package:balawish/widgets/game/hand_score_panel.dart';
 import 'package:balawish/widgets/game/playing_card_view.dart';
@@ -55,7 +56,7 @@ class _BoardState extends State<Board> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               title: Text(
-                'Manche ${run.roundNumber}',
+                'Manche ${run.roundNumber} / ${GameRun.roundCount}',
                 style: context.text.headlineSmall,
               ),
             ),
@@ -66,14 +67,17 @@ class _BoardState extends State<Board> {
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       children: [
-                        _JokerStrip(jokers: run.jokers),
+                        _JokerStrip(
+                          jokers: run.jokers,
+                          disabled: round.disabledJoker,
+                        ),
                         const SizedBox(height: 12),
                         RoundStats(run: run),
                         const SizedBox(height: 16),
                         HandScorePanel(round: round),
-                        const Spacer(),
-                        Image.asset('assets/enemies/${themeNotifier.value.name}/${round.enemy.picName}.png', height: 180),
-                        const Spacer(),
+                        const SizedBox(height: 12),
+                        Expanded(child: EnemyView(round: round)),
+                        const SizedBox(height: 12),
                         _HandView(
                           round: round,
                           onCardTap: _controller.toggleSelection,
@@ -115,9 +119,12 @@ class _BoardState extends State<Board> {
 
 // Jokers du joueur dans l'ordre d'application
 class _JokerStrip extends StatelessWidget {
-  const _JokerStrip({required this.jokers});
+  const _JokerStrip({required this.jokers, this.disabled});
 
   final List<Joker> jokers;
+
+  // Joker désactivé par le boss, affiché en grisé
+  final Joker? disabled;
 
   @override
   Widget build(BuildContext context) {
@@ -132,6 +139,7 @@ class _JokerStrip extends StatelessWidget {
                       joker: jokers[i],
                       width: double.infinity,
                       compact: true,
+                      disabled: jokers[i] == disabled,
                     )
                   : const SizedBox(height: 40),
             ),
@@ -175,6 +183,7 @@ class _HandView extends StatelessWidget {
                     card: card,
                     width: cardWidth,
                     selected: round.isSelected(card),
+                    debuffed: round.isDebuffed(card),
                     onTap: () => onCardTap(card),
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:balawish/models/cards/deck.dart';
+import 'package:balawish/models/enemy/enemy.dart';
 import 'package:balawish/models/game/game_run.dart';
 import 'package:balawish/models/game/round.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,6 +25,7 @@ void main() {
       return Round(
         blind: blind,
         deck: Deck.fromCards(cards(notation)),
+        enemy: Enemy.maliciousToken,
         handsLeft: hands,
       );
     }
@@ -75,7 +77,12 @@ void main() {
     });
 
     test('plus de défausse possible quand le compteur est à 0', () {
-      final round = Round(blind: 300, deck: Deck.standard(), discardsLeft: 0);
+      final round = Round(
+        blind: 300,
+        deck: Deck.standard(),
+        enemy: Enemy.maliciousToken,
+        discardsLeft: 0,
+      );
       round.toggleSelection(round.hand.first);
       expect(round.canPlay, isTrue);
       expect(round.canDiscard, isFalse);
@@ -116,7 +123,7 @@ void main() {
       final run = GameRun();
       expect(run.currentRound.handsLeft, 4);
 
-      // Manches 1 et 2 gagnées : la manche 3 (blinde 450) a 5 mains.
+      // Manches 1 et 2 gagnées : la manche 3 (blinde 800) a 6 mains.
       for (var i = 0; i < 2; i++) {
         run.currentRound.status = RoundStatus.won;
         run.openShop();
@@ -126,7 +133,7 @@ void main() {
       expect(run.currentRound.handsLeft, 6);
     });
 
-    test('les blindes augmentent de 50 % à chaque manche', () {
+    test("la blinde est le score de l'ennemi de la manche", () {
       expect(GameRun.blindFor(1), 300);
       expect(GameRun.blindFor(2), 450);
       expect(GameRun.blindFor(3), 800);
