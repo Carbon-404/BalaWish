@@ -1,11 +1,11 @@
-import 'package:balawish/models/cards/playing_card.dart';
+import 'package:balawish/models/cards/poker_card.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 // Face d'une carte de la main.
 // La/les cartes sélectionnées sont mises en avant
-class PlayingCardView extends StatelessWidget {
-  const PlayingCardView({
+class CardView extends StatelessWidget {
+  const CardView({
     super.key,
     required this.card,
     required this.width,
@@ -14,12 +14,12 @@ class PlayingCardView extends StatelessWidget {
     this.debuffed = false,
   });
 
-  final PlayingCard card;
+  final PokerCard card;
   final double width;
   final bool selected;
   final VoidCallback? onTap;
 
-  // Carte neutralisée par un boss : elle ne marquera pas
+  // Carte grisée
   final bool debuffed;
 
   static const heightRatio = 1.45;
@@ -27,7 +27,7 @@ class PlayingCardView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final game = context.game;
-    final ink = card.suit.isRed ? game.cardRed : game.cardBlack;
+    final ink = card.family.isRed ? game.cardRed : game.cardBlack;
     final isNeon = game.glow > 0;
 
     return GestureDetector(
@@ -78,7 +78,7 @@ class PlayingCardView extends StatelessWidget {
                 Align(
                   alignment: const Alignment(0, 0.5),
                   child: Text(
-                    card.suit.symbol,
+                    card.family.symbol,
                     style: TextStyle(color: ink, fontSize: width * 0.5),
                   ),
                 ),

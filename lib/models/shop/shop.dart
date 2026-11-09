@@ -1,18 +1,17 @@
 import 'dart:math';
 
 import 'package:balawish/models/jokers/joker.dart';
-import 'package:balawish/models/jokers/joker_catalog.dart';
+import 'package:balawish/models/jokers/joker_list.dart';
 
 // Offres de la boutique entre deux manches
 class Shop {
-  // Propose [offerCount] jokers au hasard parmi ceux que le joueur n'a pas déjà
-  // (un joker n'est donc jamais détenu en double)
+  // Propose plusieurd jokers au hasard (exclus ceux déjà achetées)
   Shop({required List<Joker> owned, Random? random})
-    : offers = List<Joker?>.of(
-        (JokerCatalog.all.where((j) => !owned.contains(j)).toList()
-              ..shuffle(random))
-            .take(offerCount),
-      );
+      : offers = List<Joker?>.of(
+    (JokerCatalog.all.where((j) => !owned.contains(j)).toList()
+      ..shuffle(random))
+        .take(offerCount),
+  );
 
   static const offerCount = 3;
 

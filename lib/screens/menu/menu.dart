@@ -1,14 +1,11 @@
-import 'package:balawish/controllers/purse_controller.dart';
-import 'package:balawish/screens/board/board.dart';
-import 'package:balawish/screens/planet_shop/planet_shop.dart';
 import 'package:balawish/screens/settings/settings.dart';
-import 'package:balawish/screens/stats/stats.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:balawish/widgets/menu/card_fan.dart';
+import 'package:balawish/widgets/generic/floating_button.dart';
 import 'package:balawish/widgets/generic/background.dart';
 import 'package:flutter/material.dart';
 
-import '../../widgets/generic/floating_button.dart';
+import '../board/history_mode_board.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -45,10 +42,10 @@ class Menu extends StatelessWidget {
                       const Spacer(),
                       FloatingButton(
                         onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const Board()),
+                          MaterialPageRoute(builder: (_) => const HistoryModeBoard()),
                         ),
                         label: Text(
-                          'JOUER',
+                          'Mode Histoire',
                           style: context.text.headlineMedium?.copyWith(
                             color: game.onAccent,
                           ),
@@ -56,51 +53,22 @@ class Menu extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       FloatingButton(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const PlanetShopScreen(),
-                          ),
-                        ),
+                        onPressed: () => {},
                         label: Text(
-                          'Boutique',
-                          style: context.text.headlineSmall?.copyWith(
+                          'Mode Arcade',
+                          style: context.text.headlineMedium?.copyWith(
                             color: game.onAccent,
                           ),
                         ),
                       ),
                       const SizedBox(height: 24),
                       FloatingButton(
-                        onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(
-                            builder: (_) => const StatsScreen(),
-                          ),
-                        ),
+                        onPressed: () => {},
                         label: Text(
-                          'Statistiques',
+                          'Stats',
                           style: context.text.headlineSmall?.copyWith(
                             color: game.onAccent,
                           ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              // Bourse globale, alimentée à la fin de chaque partie
-              Positioned(
-                top: 20,
-                left: 16,
-                child: ListenableBuilder(
-                  listenable: playerPurse,
-                  builder: (context, _) => Row(
-                    children: [
-                      Icon(Icons.savings, color: game.coins),
-                      const SizedBox(width: 6),
-                      Text(
-                        '${playerPurse.coins}',
-                        style: context.text.titleMedium?.copyWith(
-                          color: game.coins,
-                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],

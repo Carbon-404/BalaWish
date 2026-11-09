@@ -1,22 +1,25 @@
-import 'package:balawish/models/cards/playing_card.dart';
+import 'package:balawish/models/cards/poker_card.dart';
 import 'package:balawish/models/jokers/joker.dart';
-import 'package:balawish/models/planets/hand_levels.dart';
-
-import 'hand_evaluator.dart';
-import 'poker_hand.dart';
-import 'score_context.dart';
+import 'package:balawish/models/calculator/hand_score.dart';
+import 'package:balawish/models/calculator/score_context.dart';
 
 // Détail du score d'une main jouée
 class ScoreBreakdown {
-  const ScoreBreakdown(this.result, this.chips, this.mult);
 
-  final HandResult result;
-  final int chips;
+  final HandScore result;
+  final int value;
   final int mult;
 
-  PokerHand get hand => result.hand;
 
-  int get total => chips * mult;
+  const ScoreBreakdown(this.result, this.value, this.mult);
+
+  PokerHand getHand() {
+    return result.hand;
+  }
+  
+  int getTotalScore() {
+    return value * mult;
+  }
 }
 
 // Compte les points d'une main dans l'ordre
@@ -27,18 +30,17 @@ class ScoreCalculator {
   /// rapportent pas de jetons et ne déclenchent pas les jokers
   /// [levels] contient les niveaux des mains gagnés avec les planètes
   static ScoreBreakdown score(
-    HandResult result, [
-    List<Joker> jokers = const [],
-    bool Function(PlayingCard card)? isDebuffed,
-    HandLevels? levels,
-  ]) {
-    // jetons et multi du type de main, à son niveau actuel
-    final context = ScoreContext(result, levels ?? HandLevels());
+      HandScore result, [
+        List<Joker> jokers = const [],
+        bool Function(PokerCard card)? isDebuffed,
+      ]) {
+    // jetons et multi de base du type de main
+    final context = ScoreContext(result);
 
     // les cartes qui forment la main de gauche à droite avec les effets de joker liés à chaque carte
     for (final card in result.scoringCards) {
       if (isDebuffed?.call(card) ?? false) continue;
-      context.chips += card.chips;
+      context.value += card.value;
       for (final joker in jokers) {
         joker.onCardScored(context, card);
       }
@@ -49,6 +51,6 @@ class ScoreCalculator {
       joker.onHandScored(context);
     }
 
-    return ScoreBreakdown(result, context.chips, context.mult);
+    return ScoreBreakdown(result, context.value, context.mult);
   }
 }

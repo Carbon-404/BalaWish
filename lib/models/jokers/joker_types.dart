@@ -1,22 +1,21 @@
-import 'package:balawish/models/cards/playing_card.dart';
-import 'package:balawish/models/cards/suit.dart';
-import 'package:balawish/models/poker/poker_hand.dart';
-import 'package:balawish/models/poker/score_context.dart';
+import 'package:balawish/models/cards/poker_card.dart';
+import 'package:balawish/models/calculator/hand_score.dart';
+import 'package:balawish/models/calculator/score_context.dart';
+import 'package:balawish/models/jokers/joker.dart';
 
-import 'joker.dart';
-
-// Types d'effets réutilisables : un nouveau joker est en général une nouvelle
-// instance de l'un d'eux dans JokerCatalog. Un effet inédit = une nouvelle classe ici
+// Types d'effets réutilisables :
+// nouveau joker -> nouvelle instance dans JokerList
+// nouvel effet -> nouvelle classe ici
 
 // +multi à chaque main jouée
 class FlatMultJoker extends Joker {
+  final int mult;
+
   FlatMultJoker({
     required super.name,
     required this.mult,
     super.rarity = JokerRarity.common,
   }) : super(description: '+$mult multi');
-
-  final int mult;
 
   @override
   void onHandScored(ScoreContext context) {
@@ -26,54 +25,54 @@ class FlatMultJoker extends Joker {
 
 // Bonus de jetons et/ou de multi quand la main jouée fait partie de [hands]
 class HandTypeJoker extends Joker {
+  final Set<PokerHand> hands;
+  final int value;
+  final int mult;
+
   HandTypeJoker({
     required super.name,
     required super.description,
     required this.hands,
-    this.chips = 0,
+    this.value = 0,
     this.mult = 0,
     super.rarity = JokerRarity.common,
   });
 
-  final Set<PokerHand> hands;
-  final int chips;
-  final int mult;
-
   @override
   void onHandScored(ScoreContext context) {
     if (!hands.contains(context.result.hand)) return;
-    context.chips += chips;
+    context.value += value;
     context.mult += mult;
   }
 }
 
-// +multi pour chaque carte de l'enseigne [suit] qui marque
-class SuitJoker extends Joker {
-  SuitJoker({
-    required super.name,
-    required this.suit,
-    required this.mult,
-    super.rarity = JokerRarity.common,
-  }) : super(description: '+$mult multi par carte ${suit.symbol} qui marque');
-
-  final Suit suit;
+// +multi pour chaque carte de la fammille qui marque
+class FamilyJoker extends Joker {
+  final Family family;
   final int mult;
 
+  FamilyJoker({
+    required super.name,
+    required this.family,
+    required this.mult,
+    super.rarity = JokerRarity.common,
+  }) : super(description: '+$mult multi par carte ${family.symbol} qui marque');
+
   @override
-  void onCardScored(ScoreContext context, PlayingCard card) {
-    if (card.suit == suit) context.mult += mult;
+  void onCardScored(ScoreContext context, PokerCard card) {
+    if (card.family == family) context.mult += mult;
   }
 }
 
 // Multiplie le multi : à placer après les jokers qui l'augmentent
 class TimesMultJoker extends Joker {
+  final int factor;
+ 
   TimesMultJoker({
     required super.name,
     required this.factor,
     super.rarity = JokerRarity.rare,
   }) : super(description: '×$factor multi');
-
-  final int factor;
 
   @override
   void onHandScored(ScoreContext context) {
@@ -83,15 +82,15 @@ class TimesMultJoker extends Joker {
 
 // Pièces supplémentaires à chaque manche gagnée
 class EconomyJoker extends Joker {
+  final int coins;
+
   EconomyJoker({
     required super.name,
     required this.coins,
     super.rarity = JokerRarity.common,
   }) : super(
-         description: '+$coins pièce${coins > 1 ? 's' : ''} en fin de manche',
-       );
-
-  final int coins;
+    description: '+$coins pièce${coins > 1 ? 's' : ''} en fin de manche',
+  );
 
   @override
   int get roundEndCoins => coins;

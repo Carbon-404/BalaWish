@@ -1,5 +1,5 @@
-import 'package:balawish/models/cards/playing_card.dart';
-import 'package:balawish/models/poker/score_context.dart';
+import 'package:balawish/models/cards/poker_card.dart';
+import 'package:balawish/models/calculator/score_context.dart';
 
 // Rareté d'un joker : fixe ses prix et la couleur de son cadre (GameColors.rarity)
 // Pour changer les prix d'une catégorie, il suffit de modifier les valeurs ici
@@ -29,7 +29,7 @@ abstract class Joker {
   int get sellPrice => rarity.sellPrice;
 
   // Quand une carte de la main marque des points (étape 2 du décompte)
-  void onCardScored(ScoreContext context, PlayingCard card) {}
+  void onCardScored(ScoreContext context, PokerCard card) {}
 
   // Après les cartes, de gauche à droite (étape 3 du décompte)
   void onHandScored(ScoreContext context) {}

@@ -1,18 +1,10 @@
-import 'package:balawish/controllers/planet_controller.dart';
-import 'package:balawish/controllers/purse_controller.dart';
-import 'package:balawish/controllers/stats_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:balawish/screens/menu/menu.dart';
 import 'package:balawish/theme/theme.dart';
 
-Future<void> main() async {
+void main() {
   // Nécessaire pour lire le stockage du téléphone avant runApp
   WidgetsFlutterBinding.ensureInitialized();
-  await Future.wait([
-    playerStats.load(),
-    playerPurse.load(),
-    playerPlanets.load(),
-  ]);
   runApp(const MyApp());
 }
 

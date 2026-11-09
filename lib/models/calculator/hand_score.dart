@@ -1,4 +1,6 @@
-/// Les mains de poker de la plus faible à la plus forte avec leurs jetons et multi de base
+import 'package:balawish/models/cards/poker_card.dart';
+
+// Les mains de poker de la plus faible à la plus forte avec leurs jetons et multi
 enum PokerHand {
   highCard('Carte haute', 5, 1),
   pair('Paire', 10, 2),
@@ -16,4 +18,15 @@ enum PokerHand {
   final String label;
   final int baseChips;
   final int baseMult;
+}
+
+
+// Résultat de l'évaluation du score d'une sélection de cartes
+class HandScore {
+  const HandScore(this.hand, this.scoringCards);
+  final PokerHand hand;
+
+  // Cartes qui forment la main de poker dans l'ordre où elles ont été jouées
+  // Les autres ne marquent pas
+  final List<PokerCard> scoringCards;
 }

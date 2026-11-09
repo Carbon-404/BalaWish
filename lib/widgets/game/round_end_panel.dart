@@ -1,4 +1,4 @@
-import 'package:balawish/models/game/game_run.dart';
+import 'package:balawish/models/game/game_story_mode.dart';
 import 'package:balawish/models/game/round.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:balawish/widgets/enemy/enemy_view.dart';
@@ -14,7 +14,7 @@ class RoundEndPanel extends StatelessWidget {
     required this.onQuit,
   });
 
-  final GameRun run;
+  final GameStoryMode run;
   final VoidCallback onOpenShop;
   final VoidCallback onRestart;
   final VoidCallback onQuit;
@@ -66,18 +66,18 @@ class RoundEndPanel extends StatelessWidget {
                 const SizedBox(height: 8),
                 if (victory)
                   Text(
-                    'Vous avez battu les ${GameRun.roundCount} ennemis. '
-                    'La Maison ne gagne pas toujours !',
+                    'Vous avez battu les ${GameStoryMode.roundCount} ennemis. '
+                        'La Maison ne gagne pas toujours !',
                     textAlign: TextAlign.center,
                     style: context.text.bodyMedium?.copyWith(color: game.coins),
                   )
                 else if (won) ...[
                   Text(
                     '+${run.roundReward} pièces\n'
-                    '${GameRun.baseReward} de base + ${round.handsLeft} '
-                    'pour les mains non jouées'
-                    '${run.jokerCoins > 0 ? ' + ${run.jokerCoins} des jokers' : ''}'
-                    '${run.rewardMultiplier > 1 ? ', ×${run.rewardMultiplier} (${enemy.name})' : ''}',
+                        '${GameStoryMode.baseReward} de base + ${round.handsLeft} '
+                        'pour les mains non jouées'
+                        '${run.jokerCoins > 0 ? ' + ${run.jokerCoins} des jokers' : ''}'
+                        '${run.rewardMultiplier > 1 ? ', ×${run.rewardMultiplier} (${enemy.name})' : ''}',
                     textAlign: TextAlign.center,
                     style: context.text.bodyMedium?.copyWith(color: game.coins),
                   ),
@@ -86,21 +86,12 @@ class RoundEndPanel extends StatelessWidget {
                 ] else
                   Text(
                     '${enemy.name} vous a battu à la manche '
-                    '${run.roundNumber} / ${GameRun.roundCount}.',
+                        '${run.roundNumber} / ${GameStoryMode.roundCount}.',
                     textAlign: TextAlign.center,
                     style: context.text.bodyMedium?.copyWith(
                       color: game.textMuted,
                     ),
                   ),
-                if (run.isOver) ...[
-                  const SizedBox(height: 12),
-                  Text(
-                    '+${run.coinsForPurse} pièces dans votre bourse'
-                    '${victory ? '' : '\n(la moitié de vos ${run.coins} pièces)'}',
-                    textAlign: TextAlign.center,
-                    style: context.text.titleSmall?.copyWith(color: game.coins),
-                  ),
-                ],
                 const SizedBox(height: 24),
                 if (won && !victory)
                   FilledButton(
@@ -140,9 +131,9 @@ class _NextRoundPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final game = context.game;
-    final enemy = GameRun.enemyFor(roundNumber);
-    final hands = GameRun.handsFor(enemy.score);
-    final previousHands = GameRun.handsFor(GameRun.blindFor(roundNumber - 1));
+    final enemy = GameStoryMode.enemyFor(roundNumber);
+    final hands = GameStoryMode.handsFor(enemy.score);
+    final previousHands = GameStoryMode.handsFor(GameStoryMode.blindFor(roundNumber - 1));
 
     return Column(
       children: [

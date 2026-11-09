@@ -1,7 +1,7 @@
-import 'package:balawish/models/game/game_run.dart';
+import 'package:balawish/models/game/game_story_mode.dart';
 import 'package:balawish/models/jokers/joker.dart';
 import 'package:balawish/theme/theme.dart';
-import 'package:balawish/widgets/jokers/joker_view.dart';
+import 'package:balawish/widgets/joker/joker_view.dart';
 import 'package:flutter/material.dart';
 
 // Boutique entre deux manches : acheter, vendre et réordonner les jokers
@@ -15,7 +15,7 @@ class ShopScreen extends StatelessWidget {
     required this.onContinue,
   });
 
-  final GameRun run;
+  final GameStoryMode run;
   final ValueChanged<int> onBuy;
   final ValueChanged<int> onSell;
   final void Function(int from, int to) onMove;
@@ -72,7 +72,7 @@ class ShopScreen extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               _SectionTitle(
-                'VOS JOKERS (${jokers.length}/${GameRun.maxJokers})',
+                'VOS JOKERS (${jokers.length}/${GameStoryMode.maxJokers})',
               ),
               Text(
                 'Maintenir déposez-le sur un autre emplacement pour le déplacer.',
@@ -114,7 +114,7 @@ class _JokerGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = (GameRun.maxJokers / _columns).ceil();
+    final rows = (GameStoryMode.maxJokers / _columns).ceil();
 
     return Column(
       children: [
@@ -145,7 +145,7 @@ class _JokerGrid extends StatelessWidget {
   // Chacun accepte un joker déposé, qui prend alors sa place
   Widget _slot(BuildContext context, int index) {
     // La grille peut avoir plus de cases que de jokers autorisés
-    if (index >= GameRun.maxJokers) return const SizedBox();
+    if (index >= GameStoryMode.maxJokers) return const SizedBox();
 
     final isEmpty = index >= jokers.length;
     // Déposé sur une case vide, le joker passe en dernière position

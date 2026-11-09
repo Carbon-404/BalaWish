@@ -1,12 +1,11 @@
 import 'package:balawish/models/game/round.dart';
-import 'package:balawish/models/planets/hand_levels.dart';
-import 'package:balawish/models/poker/hand_evaluator.dart';
+import 'package:balawish/models/calculator/hand_calculator.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:flutter/material.dart';
 
 // Main créée avec la sélection jetons et multi, ou le résultat de la dernière main (par défaut)
-class HandScorePanel extends StatelessWidget {
-  const HandScorePanel({super.key, required this.round});
+class ScorePanel extends StatelessWidget {
+  const ScorePanel({super.key, required this.round});
 
   final Round round;
 
@@ -17,25 +16,20 @@ class HandScorePanel extends StatelessWidget {
     final last = round.lastScore;
 
     String title;
-    String chips = '-';
+    String value = '-';
     String mult = '-';
     String? total;
 
     if (selected.isNotEmpty) {
-      // Valeurs de départ de la main, à son niveau actuel (planètes)
-      final hand = HandEvaluator.evaluate(selected).hand;
-      final levels = round.handLevels;
-      final level = levels.levelOf(hand);
-      title = level > HandLevels.baseLevel
-          ? '${hand.label} · Niv. $level'
-          : hand.label;
-      chips = '${levels.chipsFor(hand)}';
-      mult = '${levels.multFor(hand)}';
+      final hand = HandCalculator.evaluate(selected).hand;
+      title = hand.label;
+      value = '${hand.baseChips}';
+      mult = '${hand.baseMult}';
     } else if (last != null) {
-      title = last.hand.label;
-      chips = '${last.chips}';
+      title = last.getHand().label;
+      value = '${last.value}';
       mult = '${last.mult}';
-      total = '+${last.total}';
+      total = '+${last.getTotalScore()}';
     } else {
       title = "Sélectionnez jusqu'à 5 cartes";
     }
@@ -54,7 +48,7 @@ class HandScorePanel extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _ValueBox(value: chips, color: game.chips),
+              _ValueBox(value: value, color: game.chips),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 12),
                 child: Text('×', style: context.text.headlineMedium),

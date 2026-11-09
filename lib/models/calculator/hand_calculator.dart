@@ -1,26 +1,13 @@
-import 'package:balawish/models/cards/playing_card.dart';
-import 'package:balawish/models/cards/rank.dart';
-
-import 'poker_hand.dart';
-
-// Résultat de l'évaluation du score d'une sélection de cartes
-class HandResult {
-  const HandResult(this.hand, this.scoringCards);
-
-  final PokerHand hand;
-
-  // Cartes qui forment la main de poker dans l'ordre où elles ont été jouées
-  // Les autres ne marquent pas
-  final List<PlayingCard> scoringCards;
-}
+import 'package:balawish/models/cards/poker_card.dart';
+import 'package:balawish/models/calculator/hand_score.dart';
 
 // Détermine la meilleure main de poker formée par 1 à 5 cartes
-class HandEvaluator {
-  HandEvaluator._();
-
+class HandCalculator {
   static const maxCards = 5;
 
-  static HandResult evaluate(List<PlayingCard> cards) {
+  HandCalculator._();
+
+  static HandScore evaluate(List<PokerCard> cards) {
     if (cards.isEmpty || cards.length > maxCards) {
       throw ArgumentError('Il faut entre 1 et $maxCards cartes.');
     }
@@ -30,7 +17,7 @@ class HandEvaluator {
 
     if (isFlush && isStraight) {
       final isRoyal = cards.every((c) => c.rank.order >= Rank.ten.order);
-      return HandResult(
+      return HandScore(
         isRoyal ? PokerHand.royalFlush : PokerHand.straightFlush,
         cards,
       );
@@ -44,10 +31,10 @@ class HandEvaluator {
       return _result(PokerHand.fourOfAKind, cards, groups.first);
     }
     if (biggest == 3 && second == 2) {
-      return HandResult(PokerHand.fullHouse, cards);
+      return HandScore(PokerHand.fullHouse, cards);
     }
-    if (isFlush) return HandResult(PokerHand.flush, cards);
-    if (isStraight) return HandResult(PokerHand.straight, cards);
+    if (isFlush) return HandScore(PokerHand.flush, cards);
+    if (isStraight) return HandScore(PokerHand.straight, cards);
     if (biggest == 3) {
       return _result(PokerHand.threeOfAKind, cards, groups.first);
     }
@@ -61,18 +48,18 @@ class HandEvaluator {
   }
 
   /// Garde les cartes de [scoring] dans l'ordre de jeu de [played].
-  static HandResult _result(
-    PokerHand hand,
-    List<PlayingCard> played,
-    List<PlayingCard> scoring,
-  ) {
-    return HandResult(hand, played.where(scoring.contains).toList());
+  static HandScore _result(
+      PokerHand hand,
+      List<PokerCard> played,
+      List<PokerCard> scoring,
+      ) {
+    return HandScore(hand, played.where(scoring.contains).toList());
   }
 
   // Regroupe les cartes par rang
   // Les groupes sont triés du plus grand au plus petit et du rang le plus haut au plus bas
-  static List<List<PlayingCard>> _groupByRank(List<PlayingCard> cards) {
-    final byRank = <Rank, List<PlayingCard>>{};
+  static List<List<PokerCard>> _groupByRank(List<PokerCard> cards) {
+    final byRank = <Rank, List<PokerCard>>{};
     for (final card in cards) {
       byRank.putIfAbsent(card.rank, () => []).add(card);
     }
@@ -83,14 +70,14 @@ class HandEvaluator {
     });
   }
 
-  static bool _isFlush(List<PlayingCard> cards) {
+  static bool _isFlush(List<PokerCard> cards) {
     return cards.length == maxCards &&
-        cards.every((c) => c.suit == cards.first.suit);
+        cards.every((c) => c.family == cards.first.family);
   }
 
   // Cinq rangs consécutifs
   // L'as peut être en haut (10-J-Q-K-A) ou en bas (A-2-3-4-5)
-  static bool _isStraight(List<PlayingCard> cards) {
+  static bool _isStraight(List<PokerCard> cards) {
     if (cards.length != maxCards) return false;
 
     final orders = cards.map((c) => c.rank.order).toSet();

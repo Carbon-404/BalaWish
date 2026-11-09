@@ -1,19 +1,10 @@
 /// Effet spécial d'un boss, appliqué pendant toute la manche
 enum BossEffect {
-  // Aucun effet (ennemis classiques)
-  none,
-
-  // Les cartes ♠ ne marquent pas (ni jetons, ni effets de joker)
-  spadesDisabled,
-
-  // Une couleur tirée au hasard au début de chaque main ne marque pas
-  randomColorDisabled,
-
-  // Une seule défausse, mais la récompense de la manche est doublée
-  singleDiscardDoubleReward,
-
-  // Le joker le plus à gauche est désactivé
-  disableFirstJoker,
+  none, // Aucun effet (ennemis classiques)
+  spadesDisabled, // Les cartes ♠ ne marquent pas (ni jetons, ni effets de joker)
+  randomFamilyDisabled, // Une couleur tirée au hasard au début de chaque main ne marque pas
+  singleDiscardDoubleReward, // Une seule défausse, mais la récompense de la manche est doublée
+  disableFirstJoker // Le joker le plus à gauche est désactivé
 }
 
 /// Les ennemis du casino, affrontés dans l'ordre de [order]
@@ -71,7 +62,7 @@ enum Enemy {
     2500,
     'Un aristocrate au monocle dont le ventre tourne comme une roulette. Il adore les paris et peut changer le cours de la partie.',
     'Une couleur de cartes interdite, tirée au début de chaque main',
-    BossEffect.randomColorDisabled,
+    BossEffect.randomFamilyDisabled,
   ),
   ghostCroupier(
     7,
@@ -102,14 +93,14 @@ enum Enemy {
   );
 
   const Enemy(
-    this.order,
-    this.name,
-    this.picName,
-    this.score,
-    this.description,
-    this.effectDescription,
-    this.effect,
-  );
+      this.order,
+      this.name,
+      this.picName,
+      this.score,
+      this.description,
+      this.effectDescription,
+      this.effect,
+      );
 
   final int order;
   final String name;

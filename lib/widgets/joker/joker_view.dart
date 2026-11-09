@@ -55,10 +55,10 @@ class JokerView extends StatelessWidget {
                 textAlign: TextAlign.center,
                 maxLines: 2,
                 style:
-                    (compact
-                            ? context.text.labelSmall
-                            : context.text.labelLarge)
-                        ?.copyWith(color: color, fontWeight: FontWeight.w700),
+                (compact
+                    ? context.text.labelSmall
+                    : context.text.labelLarge)
+                    ?.copyWith(color: color, fontWeight: FontWeight.w700),
               ),
               if (!compact) ...[
                 const SizedBox(height: 6),

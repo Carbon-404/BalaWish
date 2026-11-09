@@ -1,30 +1,30 @@
 import 'dart:math';
 
 import 'package:balawish/controllers/game_controller.dart';
-import 'package:balawish/models/cards/playing_card.dart';
-import 'package:balawish/models/game/game_run.dart';
+import 'package:balawish/models/cards/poker_card.dart';
+import 'package:balawish/models/game/game_story_mode.dart';
 import 'package:balawish/models/game/round.dart';
 import 'package:balawish/models/jokers/joker.dart';
-import 'package:balawish/screens/shop/shop.dart';
+import 'package:balawish/screens/board/shop/shop.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:balawish/widgets/enemy/enemy_view.dart';
-import 'package:balawish/widgets/jokers/joker_view.dart';
-import 'package:balawish/widgets/game/hand_score_panel.dart';
-import 'package:balawish/widgets/game/playing_card_view.dart';
+import 'package:balawish/widgets/joker/joker_view.dart';
+import 'package:balawish/widgets/game/score_panel.dart';
+import 'package:balawish/widgets/game/card_view.dart';
 import 'package:balawish/widgets/game/round_end_panel.dart';
 import 'package:balawish/widgets/game/round_stats.dart';
 import 'package:balawish/widgets/generic/background.dart';
 import 'package:flutter/material.dart';
 
 // Gameboard adapté au thème
-class Board extends StatefulWidget {
-  const Board({super.key});
+class HistoryModeBoard extends StatefulWidget {
+  const HistoryModeBoard({super.key});
 
   @override
-  State<Board> createState() => _BoardState();
+  State<HistoryModeBoard> createState() => _BoardState();
 }
 
-class _BoardState extends State<Board> {
+class _BoardState extends State<HistoryModeBoard> {
   final _controller = GameController();
 
   @override
@@ -56,7 +56,7 @@ class _BoardState extends State<Board> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               title: Text(
-                'Manche ${run.roundNumber} / ${GameRun.roundCount}',
+                'Manche ${run.roundNumber} / ${GameStoryMode.roundCount}',
                 style: context.text.headlineSmall,
               ),
             ),
@@ -74,7 +74,7 @@ class _BoardState extends State<Board> {
                         const SizedBox(height: 12),
                         RoundStats(run: run),
                         const SizedBox(height: 16),
-                        HandScorePanel(round: round),
+                        ScorePanel(round: round),
                         const SizedBox(height: 12),
                         Expanded(child: EnemyView(round: round)),
                         const SizedBox(height: 12),
@@ -130,17 +130,17 @@ class _JokerStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        for (var i = 0; i < GameRun.maxJokers; i++)
+        for (var i = 0; i < GameStoryMode.maxJokers; i++)
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: i < jokers.length
                   ? JokerView(
-                      joker: jokers[i],
-                      width: double.infinity,
-                      compact: true,
-                      disabled: jokers[i] == disabled,
-                    )
+                joker: jokers[i],
+                width: double.infinity,
+                compact: true,
+                disabled: jokers[i] == disabled,
+              )
                   : const SizedBox(height: 40),
             ),
           ),
@@ -154,7 +154,7 @@ class _HandView extends StatelessWidget {
   const _HandView({required this.round, required this.onCardTap});
 
   final Round round;
-  final ValueChanged<PlayingCard> onCardTap;
+  final ValueChanged<PokerCard> onCardTap;
 
   static const _spacing = 4.0;
   static const _maxCardWidth = 80.0;
@@ -171,7 +171,7 @@ class _HandView extends StatelessWidget {
 
         return SizedBox(
           // Place réservée pour les cartes sélectionnées, qui se soulèvent.
-          height: cardWidth * PlayingCardView.heightRatio * 1.2,
+          height: cardWidth * CardView.heightRatio * 1.2,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.end,
@@ -179,7 +179,7 @@ class _HandView extends StatelessWidget {
               for (final card in round.hand)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: _spacing / 2),
-                  child: PlayingCardView(
+                  child: CardView(
                     card: card,
                     width: cardWidth,
                     selected: round.isSelected(card),
@@ -234,11 +234,11 @@ class _ActionButtons extends StatelessWidget {
   }
 
   Widget _actionButton(
-    BuildContext context, {
-    required String label,
-    required Color color,
-    required VoidCallback? onPressed,
-  }) {
+      BuildContext context, {
+        required String label,
+        required Color color,
+        required VoidCallback? onPressed,
+      }) {
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(

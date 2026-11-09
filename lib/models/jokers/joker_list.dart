@@ -1,5 +1,5 @@
-import 'package:balawish/models/cards/suit.dart';
-import 'package:balawish/models/poker/poker_hand.dart';
+import 'package:balawish/models/cards/poker_card.dart';
+import 'package:balawish/models/calculator/hand_score.dart';
 
 import 'joker.dart';
 import 'joker_types.dart';
@@ -15,7 +15,7 @@ class JokerCatalog {
       name: 'Joker Paire',
       description: '+20 jetons si la main contient une paire',
       hands: {PokerHand.pair, PokerHand.twoPair, PokerHand.fullHouse},
-      chips: 20,
+      value: 20,
     ),
     HandTypeJoker(
       name: 'Joker Brelan',
@@ -42,10 +42,10 @@ class JokerCatalog {
       mult: 10,
       rarity: JokerRarity.uncommon,
     ),
-    SuitJoker(name: 'Joker Cœur', suit: Suit.hearts, mult: 3),
-    SuitJoker(name: 'Joker Carreau', suit: Suit.diamonds, mult: 3),
-    SuitJoker(name: 'Joker Pique', suit: Suit.spades, mult: 3),
-    SuitJoker(name: 'Joker Trèfle', suit: Suit.clubs, mult: 3),
+    FamilyJoker(name: 'Joker Cœur', family: Family.hearts, mult: 3),
+    FamilyJoker(name: 'Joker Carreau', family: Family.diamonds, mult: 3),
+    FamilyJoker(name: 'Joker Pique', family: Family.spades, mult: 3),
+    FamilyJoker(name: 'Joker Trèfle', family: Family.clubs, mult: 3),
     EconomyJoker(name: 'Joker Économe', coins: 1),
     TimesMultJoker(name: 'Joker Fou', factor: 2),
   ];

@@ -1,4 +1,4 @@
-import 'package:balawish/models/game/game_run.dart';
+import 'package:balawish/models/game/game_story_mode.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 class RoundStats extends StatelessWidget {
   const RoundStats({super.key, required this.run});
 
-  final GameRun run;
+  final GameStoryMode run;
 
   @override
   Widget build(BuildContext context) {
