@@ -4,6 +4,7 @@ import 'package:balawish/models/cards/deck.dart';
 import 'package:balawish/models/cards/playing_card.dart';
 import 'package:balawish/models/cards/suit.dart';
 import 'package:balawish/models/jokers/joker.dart';
+import 'package:balawish/models/planets/hand_levels.dart';
 import 'package:balawish/models/poker/hand_evaluator.dart';
 import 'package:balawish/models/poker/score_calculator.dart';
 import 'package:balawish/models/enemy/enemy.dart';
@@ -24,9 +25,11 @@ class Round {
     this.handsLeft = defaultHands,
     int? discardsLeft,
     List<Joker> jokers = const [],
+    HandLevels? handLevels,
     Random? random,
   }) : _deck = deck,
        _random = random ?? Random(),
+       handLevels = handLevels ?? HandLevels(),
        discardsLeft = discardsLeft ?? discardsFor(enemy),
        disabledJoker = enemy.effect == BossEffect.disableFirstJoker
            ? jokers.firstOrNull
@@ -55,6 +58,9 @@ class Round {
 
   // Joker désactivé par le boss pour cette manche
   final Joker? disabledJoker;
+
+  // Niveaux des mains de poker, améliorés par les planètes
+  final HandLevels handLevels;
 
   final Deck _deck;
   final Random _random;
@@ -93,8 +99,8 @@ class Round {
   /// compte pour former la main, mais ne marque pas
   bool isDebuffed(PlayingCard card) {
     return switch (enemy.effect) {
-      BossEffect.spadesDebuffed => card.suit == Suit.spades,
-      BossEffect.randomSuitDebuffed => card.suit == forbiddenSuit,
+      BossEffect.spadesDisabled => card.suit == Suit.spades,
+      BossEffect.randomColorDisabled => card.suit == forbiddenSuit,
       _ => false,
     };
   }
@@ -114,6 +120,7 @@ class Round {
       HandEvaluator.evaluate(cards),
       jokers,
       isDebuffed,
+      handLevels,
     );
   }
 
@@ -156,7 +163,7 @@ class Round {
 
   // Tire une nouvelle enseigne interdite au début de chaque main
   void _rollForbiddenSuit() {
-    if (enemy.effect != BossEffect.randomSuitDebuffed) return;
+    if (enemy.effect != BossEffect.randomColorDisabled) return;
     forbiddenSuit = Suit.values[_random.nextInt(Suit.values.length)];
   }
 

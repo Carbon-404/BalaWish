@@ -152,31 +152,6 @@ void main() {
       expect(run.coins, (GameRun.baseReward + 2) * 2);
     });
 
-    test('Valet Tricheur : chaque défausse coûte une pièce', () {
-      final run = GameRun();
-      while (run.enemy != Enemy.cheatingValet) {
-        winRound(run);
-      }
-      run.coins = 1;
-      final round = run.currentRound;
-
-      round.toggleSelection(round.hand.first);
-      run.discard();
-      expect(run.coins, 0);
-      expect(round.discardsLeft, Round.defaultDiscards - 1);
-
-      // Pas de dette : le solde reste à 0
-      round.toggleSelection(round.hand.first);
-      run.discard();
-      expect(run.coins, 0);
-    });
-
-    test('les défausses sont gratuites face aux autres ennemis', () {
-      final run = GameRun()..coins = 5;
-      run.currentRound.toggleSelection(run.currentRound.hand.first);
-      run.discard();
-      expect(run.coins, 5);
-    });
   });
 
   group('Fin de partie', () {

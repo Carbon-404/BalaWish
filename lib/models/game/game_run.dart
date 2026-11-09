@@ -3,13 +3,16 @@ import 'dart:math';
 import 'package:balawish/models/cards/deck.dart';
 import 'package:balawish/models/jokers/joker.dart';
 import 'package:balawish/models/enemy/enemy.dart';
+import 'package:balawish/models/planets/hand_levels.dart';
 import 'package:balawish/models/shop/shop.dart';
 
 import 'round.dart';
 
 // Une partie complète
 class GameRun {
-  GameRun({Random? random}) : _random = random {
+  GameRun({Random? random, HandLevels? handLevels})
+    : _random = random,
+      handLevels = handLevels ?? HandLevels() {
     currentRound = _createRound();
   }
 
@@ -19,13 +22,25 @@ class GameRun {
   // Nombre max de jokers détenus
   static const maxJokers = 5;
 
+  // En cas de défaite (ou d'abandon), seule une partie des pièces va dans la bourse
+  static const lossCoinsDivisor = 2;
+
   final Random? _random;
   final List<Joker> _jokers = [];
+
+  // Niveaux des mains de poker (planètes achetées), fixes pendant la partie
+  final HandLevels handLevels;
 
   // Numéro de la manche en cours.
   int roundNumber = 1;
   int coins = 0;
   late Round currentRound;
+
+  // Score cumulé des manches déjà terminées
+  int _previousRoundsScore = 0;
+
+  // Score de la partie : total de toutes les manches jouées
+  int get totalScore => _previousRoundsScore + currentRound.score;
 
   // Boutique ouverte entre deux manches
   Shop? shop;
@@ -47,6 +62,10 @@ class GameRun {
 
   // Partie terminée, gagnée ou perdue
   bool get isOver => currentRound.status == RoundStatus.lost || isVictory;
+
+  // Pièces versées dans la bourse du joueur à la fin de la partie :
+  // toutes en cas de victoire, la moitié (arrondie à l'inférieur) sinon
+  int get coinsForPurse => isVictory ? coins : coins ~/ lossCoinsDivisor;
 
   /// Blinde de la manche [number] : le score de son ennemi
   static int blindFor(int number) => enemyFor(number).score;
@@ -85,14 +104,9 @@ class GameRun {
   int get roundReward =>
       (baseReward + currentRound.handsLeft + jokerCoins) * rewardMultiplier;
 
-  // Pièces prises par le boss à chaque défausse (Valet Tricheur)
-  int get discardCost => enemy.effect == BossEffect.discardCostsCoin ? 1 : 0;
-
-  // Défausse la sélection en appliquant le coût éventuel du boss
-  // Le boss ne prend que les pièces disponibles : le solde ne devient jamais négatif
+  // Défausse la sélection
   void discard() {
     currentRound.discard();
-    coins = max(0, coins - discardCost);
   }
 
   // Enregistre la récompense de la manche gagnée et ouvre la boutique
@@ -131,6 +145,7 @@ class GameRun {
   void nextRound() {
     if (!isInShop) throw StateError("La boutique n'est pas ouverte.");
     shop = null;
+    _previousRoundsScore += currentRound.score;
     roundNumber++;
     currentRound = _createRound();
   }
@@ -144,6 +159,7 @@ class GameRun {
       enemy: enemy,
       handsLeft: handsFor(enemy.score),
       jokers: _jokers,
+      handLevels: handLevels,
       random: _random,
     );
   }

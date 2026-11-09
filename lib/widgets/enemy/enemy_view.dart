@@ -60,7 +60,7 @@ class EnemyView extends StatelessWidget {
   // Effet du boss, complété par l'état actuel de la manche
   static String _effectText(Round round) {
     final suit = round.forbiddenSuit;
-    if (round.enemy.effect == BossEffect.randomSuitDebuffed && suit != null) {
+    if (round.enemy.effect == BossEffect.randomColorDisabled && suit != null) {
       return 'Couleur interdite pour cette main : ${suit.symbol}';
     }
     final joker = round.disabledJoker;

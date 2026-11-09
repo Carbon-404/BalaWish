@@ -1,5 +1,8 @@
+import 'package:balawish/controllers/purse_controller.dart';
 import 'package:balawish/screens/board/board.dart';
+import 'package:balawish/screens/planet_shop/planet_shop.dart';
 import 'package:balawish/screens/settings/settings.dart';
+import 'package:balawish/screens/stats/stats.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:balawish/widgets/menu/card_fan.dart';
 import 'package:balawish/widgets/generic/background.dart';
@@ -53,7 +56,11 @@ class Menu extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       FloatingButton(
-                        onPressed: () => {print("shop")},
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const PlanetShopScreen(),
+                          ),
+                        ),
                         label: Text(
                           'Boutique',
                           style: context.text.headlineSmall?.copyWith(
@@ -63,12 +70,37 @@ class Menu extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       FloatingButton(
-                        onPressed: () => {print("stats")},
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const StatsScreen(),
+                          ),
+                        ),
                         label: Text(
                           'Statistiques',
                           style: context.text.headlineSmall?.copyWith(
                             color: game.onAccent,
                           ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              // Bourse globale, alimentée à la fin de chaque partie
+              Positioned(
+                top: 20,
+                left: 16,
+                child: ListenableBuilder(
+                  listenable: playerPurse,
+                  builder: (context, _) => Row(
+                    children: [
+                      Icon(Icons.savings, color: game.coins),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${playerPurse.coins}',
+                        style: context.text.titleMedium?.copyWith(
+                          color: game.coins,
+                          fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],

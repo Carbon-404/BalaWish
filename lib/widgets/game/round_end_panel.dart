@@ -92,6 +92,15 @@ class RoundEndPanel extends StatelessWidget {
                       color: game.textMuted,
                     ),
                   ),
+                if (run.isOver) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    '+${run.coinsForPurse} pièces dans votre bourse'
+                    '${victory ? '' : '\n(la moitié de vos ${run.coins} pièces)'}',
+                    textAlign: TextAlign.center,
+                    style: context.text.titleSmall?.copyWith(color: game.coins),
+                  ),
+                ],
                 const SizedBox(height: 24),
                 if (won && !victory)
                   FilledButton(

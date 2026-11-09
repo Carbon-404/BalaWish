@@ -4,13 +4,10 @@ enum BossEffect {
   none,
 
   // Les cartes ♠ ne marquent pas (ni jetons, ni effets de joker)
-  spadesDebuffed,
+  spadesDisabled,
 
-  // Chaque défausse coûte une pièce
-  discardCostsCoin,
-
-  // Une enseigne tirée au hasard au début de chaque main ne marque pas
-  randomSuitDebuffed,
+  // Une couleur tirée au hasard au début de chaque main ne marque pas
+  randomColorDisabled,
 
   // Une seule défausse, mais la récompense de la manche est doublée
   singleDiscardDoubleReward,
@@ -47,7 +44,7 @@ enum Enemy {
     800,
     'La reine du hall règne sur les tables d’une main gantée. Les piques lui obéissent : face à elle, ils ne vous rapportent plus rien.',
     'Les cartes ♠ ne marquent pas',
-    BossEffect.spadesDebuffed,
+    BossEffect.spadesDisabled,
   ),
   cheatingValet(
     4,
@@ -55,8 +52,8 @@ enum Enemy {
     'valet_tricheur',
     1200,
     'Un valet élégant qui cache toujours une carte dans sa manche. Il sourit à chaque défausse, parce qu’il en profite pour vous faire les poches.',
-    'Chaque défausse vous coûte 1 pièce',
-    BossEffect.discardCostsCoin,
+    '',
+    BossEffect.none,
   ),
   slotMachine(
     5,
@@ -74,7 +71,7 @@ enum Enemy {
     2500,
     'Un aristocrate au monocle dont le ventre tourne comme une roulette. Il adore les paris et peut changer le cours de la partie.',
     'Une couleur de cartes interdite, tirée au début de chaque main',
-    BossEffect.randomSuitDebuffed,
+    BossEffect.randomColorDisabled,
   ),
   ghostCroupier(
     7,
