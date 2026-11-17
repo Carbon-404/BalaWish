@@ -6,6 +6,7 @@ import 'package:balawish/widgets/generic/background.dart';
 import 'package:flutter/material.dart';
 
 import '../board/history_mode_board.dart';
+import '../stats/stats.dart';
 
 class Menu extends StatelessWidget {
   const Menu({super.key});
@@ -63,7 +64,11 @@ class Menu extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       FloatingButton(
-                        onPressed: () => {},
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const StatsScreen(),
+                          ),
+                        ),
                         label: Text(
                           'Stats',
                           style: context.text.headlineSmall?.copyWith(

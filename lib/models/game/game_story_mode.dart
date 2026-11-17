@@ -24,6 +24,12 @@ class GameStoryMode {
   int coins = 0;
   late Round currentRound;
 
+  // Score cumulé des manches déjà terminées
+  int _previousRoundsScore = 0;
+
+  // Score de la partie : total de toutes les manches jouées
+  int get totalScore => _previousRoundsScore + currentRound.score;
+
   // // Boutique ouverte entre deux manches
   Shop? shop;
 
@@ -117,6 +123,7 @@ class GameStoryMode {
   void nextRound() {
     if (!isInShop) throw StateError("La boutique n'est pas ouverte.");
     shop = null;
+    _previousRoundsScore += currentRound.score;
     roundNumber++;
     currentRound = _createRound();
   }
