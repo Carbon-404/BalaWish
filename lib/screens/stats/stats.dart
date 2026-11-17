@@ -34,10 +34,24 @@ class StatsScreen extends StatelessWidget {
                         value: '${stats.gamesPlayed}',
                         color: game.chips,
                       ),
-                      const SizedBox(width: 8),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
                       _StatTile(
-                        label: 'Manche max',
-                        value: '${stats.maxRound} / ${GameStoryMode.roundCount}',
+                        label: 'Histoire : manche max',
+                        value:
+                            '${stats.maxRound} / ${GameStoryMode.roundCount}',
+                        color: game.coins,
+                      ),
+                      const SizedBox(width: 8),
+                      // L'arcade n'a pas de fin : seul le record compte
+                      _StatTile(
+                        label: 'Arcade : record',
+                        value: stats.maxArcadeRound == 0
+                            ? '—'
+                            : 'Manche ${stats.maxArcadeRound}',
                         color: game.coins,
                       ),
                     ],

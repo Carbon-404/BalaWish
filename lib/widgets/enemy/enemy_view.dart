@@ -16,7 +16,7 @@ class EnemyView extends StatelessWidget {
     final enemy = round.enemy;
 
     return GestureDetector(
-      onTap: () => showEnemyDetails(context, enemy),
+      onTap: () => showEnemyDetails(context, enemy, blind: round.blind),
       child: Column(
         children: [
           Expanded(
@@ -97,7 +97,9 @@ class BossBadge extends StatelessWidget {
 }
 
 /// Fiche de l'ennemi : portrait, description et effet
-Future<void> showEnemyDetails(BuildContext context, Enemy enemy) {
+/// [blind] est la blinde réellement demandée (en arcade, elle dépasse le
+/// score de base de l'ennemi à partir du 2e cycle)
+Future<void> showEnemyDetails(BuildContext context, Enemy enemy, {int? blind}) {
   return showDialog<void>(
     context: context,
     builder: (context) {
@@ -121,7 +123,7 @@ Future<void> showEnemyDetails(BuildContext context, Enemy enemy) {
               Text(enemy.description, style: context.text.bodyMedium),
               const SizedBox(height: 12),
               Text(
-                'Blinde : ${enemy.score}',
+                'Blinde : ${blind ?? enemy.score}',
                 style: context.text.titleSmall?.copyWith(color: game.chips),
               ),
               if (enemy.isBoss) ...[

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:balawish/models/calculator/hand_score.dart';
+import 'package:balawish/models/game/game.dart';
 import 'package:balawish/models/stats/stats.dart';
 import 'package:balawish/services/storage.dart';
 import 'package:flutter/foundation.dart';
@@ -28,8 +29,12 @@ class StatsController extends ChangeNotifier {
     _save();
   }
 
-  void recordGame({required int score, required int round}) {
-    _stats.recordGame(score: score, round: round);
+  void recordGame({
+    required int score,
+    required int round,
+    required GameMode mode,
+  }) {
+    _stats.recordGame(score: score, round: round, mode: mode);
     _save();
   }
 

@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:balawish/controllers/game_controller.dart';
 import 'package:balawish/models/cards/poker_card.dart';
-import 'package:balawish/models/game/game_story_mode.dart';
+import 'package:balawish/models/game/game.dart';
 import 'package:balawish/models/game/round.dart';
 import 'package:balawish/models/jokers/joker.dart';
 import 'package:balawish/screens/board/shop/shop.dart';
@@ -16,16 +16,18 @@ import 'package:balawish/widgets/game/round_stats.dart';
 import 'package:balawish/widgets/generic/background.dart';
 import 'package:flutter/material.dart';
 
-// Gameboard adapté au thème
-class HistoryModeBoard extends StatefulWidget {
-  const HistoryModeBoard({super.key});
+// Gameboard adapté au thème, commun au mode histoire et au mode arcade
+class GameBoard extends StatefulWidget {
+  const GameBoard({super.key, required this.mode});
+
+  final GameMode mode;
 
   @override
-  State<HistoryModeBoard> createState() => _BoardState();
+  State<GameBoard> createState() => _BoardState();
 }
 
-class _BoardState extends State<HistoryModeBoard> {
-  final _controller = GameController();
+class _BoardState extends State<GameBoard> {
+  late final _controller = GameController(mode: widget.mode);
 
   @override
   void dispose() {
@@ -55,10 +57,7 @@ class _BoardState extends State<HistoryModeBoard> {
           return Scaffold(
             appBar: AppBar(
               backgroundColor: Colors.transparent,
-              title: Text(
-                'Manche ${run.roundNumber} / ${GameStoryMode.roundCount}',
-                style: context.text.headlineSmall,
-              ),
+              title: Text(roundTitle(run), style: context.text.headlineSmall),
             ),
             body: SafeArea(
               child: Stack(
@@ -117,6 +116,14 @@ class _BoardState extends State<HistoryModeBoard> {
   }
 }
 
+// « Manche 3 / 9 » en histoire, « Arcade · Manche 12 » en arcade (sans fin)
+String roundTitle(Game run) {
+  final limit = run.roundLimit;
+  return limit == null
+      ? 'Arcade · Manche ${run.roundNumber}'
+      : 'Manche ${run.roundNumber} / $limit';
+}
+
 // Jokers du joueur dans l'ordre d'application
 class _JokerStrip extends StatelessWidget {
   const _JokerStrip({required this.jokers, this.disabled});
@@ -130,17 +137,17 @@ class _JokerStrip extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        for (var i = 0; i < GameStoryMode.maxJokers; i++)
+        for (var i = 0; i < Game.maxJokers; i++)
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 2),
               child: i < jokers.length
                   ? JokerView(
-                joker: jokers[i],
-                width: double.infinity,
-                compact: true,
-                disabled: jokers[i] == disabled,
-              )
+                      joker: jokers[i],
+                      width: double.infinity,
+                      compact: true,
+                      disabled: jokers[i] == disabled,
+                    )
                   : const SizedBox(height: 40),
             ),
           ),
@@ -234,11 +241,11 @@ class _ActionButtons extends StatelessWidget {
   }
 
   Widget _actionButton(
-      BuildContext context, {
-        required String label,
-        required Color color,
-        required VoidCallback? onPressed,
-      }) {
+    BuildContext context, {
+    required String label,
+    required Color color,
+    required VoidCallback? onPressed,
+  }) {
     return FilledButton(
       onPressed: onPressed,
       style: FilledButton.styleFrom(

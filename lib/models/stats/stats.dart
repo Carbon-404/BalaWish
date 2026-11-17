@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:balawish/models/calculator/hand_score.dart';
+import 'package:balawish/models/game/game.dart';
 
 // Stats du joueur
 class Stat {
@@ -10,6 +11,7 @@ class Stat {
     this.bestScore,
     this.worstScore,
     this.maxRound = 0,
+    this.maxArcadeRound = 0,
   }) : handsPlayed = handsPlayed ?? {};
 
   // Nombre de mains jouées pour chaque type de main de poker
@@ -21,8 +23,11 @@ class Stat {
   int? bestScore;
   int? worstScore;
 
-  // Manche la plus avancée atteinte (mode histoiré+ mode arcade)
+  // Manche la plus avancée atteinte en mode histoire (sur 9)
   int maxRound;
+
+  // Record du mode arcade : manche la plus avancée, sans limite
+  int maxArcadeRound;
 
   int handsPlayedOf(PokerHand hand) => handsPlayed[hand] ?? 0;
 
@@ -32,12 +37,21 @@ class Stat {
     handsPlayed[hand] = handsPlayedOf(hand) + 1;
   }
 
-  // Enregistre une partie terminée (ou abandonnée) avec son score et sa manche atteinte (mode histoire)
-  void recordGame({required int score, required int round}) {
+  // Enregistre une partie terminée (ou abandonnée) avec son score et sa manche atteinte
+  void recordGame({
+    required int score,
+    required int round,
+    required GameMode mode,
+  }) {
     gamesPlayed++;
     bestScore = max(bestScore ?? score, score);
     worstScore = min(worstScore ?? score, score);
-    maxRound = max(maxRound, round);
+    switch (mode) {
+      case GameMode.story:
+        maxRound = max(maxRound, round);
+      case GameMode.arcade:
+        maxArcadeRound = max(maxArcadeRound, round);
+    }
   }
 
   // Les mains sont enregistrées par leur nom (et non leur index) : réordonner
@@ -50,6 +64,7 @@ class Stat {
     'bestScore': bestScore,
     'worstScore': worstScore,
     'maxRound': maxRound,
+    'maxArcadeRound': maxArcadeRound,
   };
 
   // Les valeurs absentes ou invalides sont ignorées (données d'une ancienne version)
@@ -65,6 +80,7 @@ class Stat {
       bestScore: json['bestScore'] is int ? json['bestScore'] as int : null,
       worstScore: json['worstScore'] is int ? json['worstScore'] as int : null,
       maxRound: _intOr(json['maxRound'], 0),
+      maxArcadeRound: _intOr(json['maxArcadeRound'], 0),
     );
   }
 

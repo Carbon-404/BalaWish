@@ -7,7 +7,6 @@ import 'package:balawish/models/calculator/hand_calculator.dart';
 import 'package:balawish/models/calculator/score_calculator.dart';
 import 'package:balawish/models/enemy/enemy.dart';
 
-
 // Status d'une manche
 enum RoundStatus { playing, won, lost }
 
@@ -19,11 +18,12 @@ class Round {
   /// Nombre de défausses accordées face à [enemy]
   static int discardsFor(Enemy enemy) =>
       enemy.effect == BossEffect.singleDiscardDoubleReward
-          ? 1
-          : defaultDiscards;
+      ? 1
+      : defaultDiscards;
 
   final int blind;
-  final List<Joker> jokers; // Jokers actifs pendant la manche (sans celui désactivé par le boss)
+  final List<Joker>
+  jokers; // Jokers actifs pendant la manche (sans celui désactivé par le boss)
   final Joker? disabledJoker; // Joker désactivé par le boss pour cette manche
   final Deck _deck;
   final Random _random;
@@ -35,9 +35,10 @@ class Round {
   int discardsLeft;
   int score = 0;
   RoundStatus status = RoundStatus.playing;
-  Family? forbiddenFamily; // Famille interdite pour la main en cours (Baron Roulette)
-  ScoreBreakdown? lastScore; // Score de la dernière main jouée, pour l'affichage
-
+  Family?
+  forbiddenFamily; // Famille interdite pour la main en cours (Baron Roulette)
+  ScoreBreakdown?
+  lastScore; // Score de la dernière main jouée, pour l'affichage
 
   Round({
     required this.blind,
@@ -48,19 +49,17 @@ class Round {
     List<Joker> jokers = const [],
     Random? random,
   }) : _deck = deck,
-        _random = random ?? Random(),
-        discardsLeft = discardsLeft ?? discardsFor(enemy),
-        disabledJoker = enemy.effect == BossEffect.disableFirstJoker
-            ? jokers.firstOrNull
-            : null,
-        jokers = enemy.effect == BossEffect.disableFirstJoker
-            ? List.unmodifiable(jokers.skip(1))
-            : List.unmodifiable(jokers) {
+       _random = random ?? Random(),
+       discardsLeft = discardsLeft ?? discardsFor(enemy),
+       disabledJoker = enemy.effect == BossEffect.disableFirstJoker
+           ? jokers.firstOrNull
+           : null,
+       jokers = enemy.effect == BossEffect.disableFirstJoker
+           ? List.unmodifiable(jokers.skip(1))
+           : List.unmodifiable(jokers) {
     _rollForbiddenFamily();
     _refillHand();
   }
-
-
 
   // Cartes en main, triées par rang décroissant
   List<PokerCard> get hand => List.unmodifiable(_hand);
@@ -98,7 +97,7 @@ class Round {
     return ScoreCalculator.score(
       HandCalculator.evaluate(cards),
       jokers,
-      isDebuffed
+      isDebuffed,
     );
   }
 

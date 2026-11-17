@@ -2,6 +2,8 @@ import 'dart:math';
 
 import 'package:balawish/controllers/stats_controller.dart';
 import 'package:balawish/models/cards/poker_card.dart';
+import 'package:balawish/models/game/game.dart';
+import 'package:balawish/models/game/game_arcade_mode.dart';
 import 'package:balawish/models/game/game_story_mode.dart';
 import 'package:balawish/models/game/round.dart';
 import 'package:flutter/foundation.dart';
@@ -10,16 +12,16 @@ import 'package:flutter/foundation.dart';
 /// modifie le modèle puis prévient les widgets qui l'écoutent.
 class GameController extends ChangeNotifier {
   GameController({
+    this.mode = GameMode.story,
     Random? random,
-    StatsController? stats
+    StatsController? stats,
   }) : _random = random,
-      _stats = stats ?? playerStats,
+       _stats = stats ?? playerStats;
 
-      run = GameStoryMode(random: random);
-
+  final GameMode mode;
   final Random? _random;
   final StatsController _stats;
-  GameStoryMode run;
+  late Game run = _newRun();
 
   // Une partie ne compte dans les statistiques qu'à partir de la 1re main jouée
   bool _hasPlayedHand = false;
@@ -36,6 +38,7 @@ class GameController extends ChangeNotifier {
     final score = round.play();
     _hasPlayedHand = true;
     _stats.recordHand(score.getHand());
+    if (run.isOver) _recordGame();
     notifyListeners();
   }
 
@@ -71,10 +74,12 @@ class GameController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Relance une partie du même mode
   void restart() {
-    run = GameStoryMode(random: _random);
+    _recordGame();
+    run = _newRun();
     _hasPlayedHand = false;
-
+    _isSaved = false;
     notifyListeners();
   }
 
@@ -85,16 +90,20 @@ class GameController extends ChangeNotifier {
     super.dispose();
   }
 
-  // Nouvelle partie avec les niveaux de mains actuels (copiés : un achat de
-  // planète ne change pas une partie déjà lancée)
-  GameStoryMode _newRun() =>
-      GameStoryMode(random: _random);
+  Game _newRun() => switch (mode) {
+    GameMode.story => GameStoryMode(random: _random),
+    GameMode.arcade => GameArcadeMode(random: _random),
+  };
 
-  // Enregistre la partie en cours (terminée ou abandonnée), une seule fois :
-  // statistiques, et pièces versées dans la bourse
+  // Enregistre la partie en cours (terminée ou abandonnée) dans les
+  // statistiques, une seule fois
   void _recordGame() {
     if (_isSaved || !_hasPlayedHand) return;
     _isSaved = true;
-    _stats.recordGame(score: run.totalScore, round: run.roundNumber);
+    _stats.recordGame(
+      score: run.totalScore,
+      round: run.roundNumber,
+      mode: mode,
+    );
   }
 }

@@ -1,4 +1,4 @@
-import 'package:balawish/models/game/game_story_mode.dart';
+import 'package:balawish/models/game/game.dart';
 import 'package:balawish/models/game/round.dart';
 import 'package:balawish/theme/theme.dart';
 import 'package:balawish/widgets/enemy/enemy_view.dart';
@@ -14,7 +14,7 @@ class RoundEndPanel extends StatelessWidget {
     required this.onQuit,
   });
 
-  final GameStoryMode run;
+  final Game run;
   final VoidCallback onOpenShop;
   final VoidCallback onRestart;
   final VoidCallback onQuit;
@@ -66,27 +66,29 @@ class RoundEndPanel extends StatelessWidget {
                 const SizedBox(height: 8),
                 if (victory)
                   Text(
-                    'Vous avez battu les ${GameStoryMode.roundCount} ennemis. '
-                        'La Maison ne gagne pas toujours !',
+                    'Vous avez battu les ${run.roundLimit} ennemis. '
+                    'La Maison ne gagne pas toujours !',
                     textAlign: TextAlign.center,
                     style: context.text.bodyMedium?.copyWith(color: game.coins),
                   )
                 else if (won) ...[
                   Text(
                     '+${run.roundReward} pièces\n'
-                        '${GameStoryMode.baseReward} de base + ${round.handsLeft} '
-                        'pour les mains non jouées'
-                        '${run.jokerCoins > 0 ? ' + ${run.jokerCoins} des jokers' : ''}'
-                        '${run.rewardMultiplier > 1 ? ', ×${run.rewardMultiplier} (${enemy.name})' : ''}',
+                    '${Game.baseReward} de base + ${round.handsLeft} '
+                    'pour les mains non jouées'
+                    '${run.jokerCoins > 0 ? ' + ${run.jokerCoins} des jokers' : ''}'
+                    '${run.rewardMultiplier > 1 ? ', ×${run.rewardMultiplier} (${enemy.name})' : ''}',
                     textAlign: TextAlign.center,
                     style: context.text.bodyMedium?.copyWith(color: game.coins),
                   ),
                   const SizedBox(height: 12),
-                  _NextRoundPreview(roundNumber: run.roundNumber + 1),
+                  _NextRoundPreview(run: run, roundNumber: run.roundNumber + 1),
                 ] else
                   Text(
                     '${enemy.name} vous a battu à la manche '
-                        '${run.roundNumber} / ${GameStoryMode.roundCount}.',
+                    '${run.roundNumber}'
+                    // En arcade, il n'y a pas de dernière manche à afficher
+                    '${run.roundLimit == null ? '' : ' / ${run.roundLimit}'}.',
                     textAlign: TextAlign.center,
                     style: context.text.bodyMedium?.copyWith(
                       color: game.textMuted,
@@ -124,21 +126,24 @@ class RoundEndPanel extends StatelessWidget {
 
 // Affiche l'ennemi, la blinde et le nombre de mains de la manche suivante
 class _NextRoundPreview extends StatelessWidget {
-  const _NextRoundPreview({required this.roundNumber});
+  const _NextRoundPreview({required this.run, required this.roundNumber});
 
+  final Game run;
   final int roundNumber;
 
   @override
   Widget build(BuildContext context) {
     final game = context.game;
-    final enemy = GameStoryMode.enemyFor(roundNumber);
-    final hands = GameStoryMode.handsFor(enemy.score);
-    final previousHands = GameStoryMode.handsFor(GameStoryMode.blindFor(roundNumber - 1));
+    final enemy = run.enemyFor(roundNumber);
+    // La blinde dépend du mode (en arcade, elle dépasse celle de l'ennemi)
+    final blind = run.blindFor(roundNumber);
+    final hands = Game.handsFor(blind);
+    final previousHands = Game.handsFor(run.blindFor(roundNumber - 1));
 
     return Column(
       children: [
         GestureDetector(
-          onTap: () => showEnemyDetails(context, enemy),
+          onTap: () => showEnemyDetails(context, enemy, blind: blind),
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -163,7 +168,7 @@ class _NextRoundPreview extends StatelessWidget {
           ),
         const SizedBox(height: 4),
         Text(
-          'Blinde : ${enemy.score} — $hands mains',
+          'Blinde : $blind — $hands mains',
           style: context.text.bodyMedium?.copyWith(color: game.textMuted),
         ),
         if (hands > previousHands)

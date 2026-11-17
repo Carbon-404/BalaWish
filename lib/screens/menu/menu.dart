@@ -5,7 +5,9 @@ import 'package:balawish/widgets/generic/floating_button.dart';
 import 'package:balawish/widgets/generic/background.dart';
 import 'package:flutter/material.dart';
 
-import '../board/history_mode_board.dart';
+import 'package:balawish/models/game/game.dart';
+
+import '../board/game_board.dart';
 import '../stats/stats.dart';
 
 class Menu extends StatelessWidget {
@@ -43,7 +45,10 @@ class Menu extends StatelessWidget {
                       const Spacer(),
                       FloatingButton(
                         onPressed: () => Navigator.of(context).push(
-                          MaterialPageRoute(builder: (_) => const HistoryModeBoard()),
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const GameBoard(mode: GameMode.story),
+                          ),
                         ),
                         label: Text(
                           'Mode Histoire',
@@ -54,7 +59,12 @@ class Menu extends StatelessWidget {
                       ),
                       const SizedBox(height: 24),
                       FloatingButton(
-                        onPressed: () => {},
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) =>
+                                const GameBoard(mode: GameMode.arcade),
+                          ),
+                        ),
                         label: Text(
                           'Mode Arcade',
                           style: context.text.headlineMedium?.copyWith(
